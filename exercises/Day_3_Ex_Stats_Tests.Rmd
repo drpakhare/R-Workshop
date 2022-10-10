@@ -1,0 +1,202 @@
+---
+title: "Day-3 Exercise- Applying statistical tests"
+output: html_document
+date: "`r Sys.Date()`"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Dataset introduction
+
+In this exercise we will use dataset on acute bacterial menigitis available from [Frank E Harrel's website](https://hbiostat.org/data/repo/abm.html). These are data on 581 patients having either acute viral (abm=0) or acute bacterial (abm=1) meningitis, from a study done at Duke University Medical Center that was published in Spanos A, Harrell FE, Durack DT (1989): Differential diagnosis of acute meningitis: An analysis of the predictive value of initial observations. JAMA 262: 2700-2707.
+
+## Import dataset
+
+Dataset is stored as xlsx file in the folder sub-folder "abm" in the folder "datasets". Import the data by writing appropriate code in following chunk and save it as "df_abm"
+
+```{r data-import}
+library(tidyverse) # almost always required
+library(rio) # for generic import
+library(here) # for easy path
+# define df_abm
+df_abm <- import(here("datasets", "abm", "abm.xlsx"))
+```
+
+Object must be created now. There are 581 observations on 43 variables.
+
+## Have a quick look on dataset
+
+You can use `glimpse()` or `str()` or `head()`
+
+```{r}
+glimpse(df_abm)
+```
+
+## Let's explore dataset for more insights
+
+We can use `summary()` function from base R. It gives descriptive summary for each numerical variable with number of missing variables.
+
+```{r}
+summary(df_abm)
+```
+
+If we want better summary then we have to use exploratory data analysis packages like `skimr` or `smartEDA` or `DataExplorer` etc. There are plenty of packages and you can search them later. We will use `skimr` and function `skim` to gain some descriptive insights
+
+```{r}
+library(skimr)
+# Let's assign name "descriptive_summary" for results of `skim()`
+descriptive_summary <- skim(df_abm)
+```
+
+Now we have idea about number of missing variables and types of variables etc.
+
+## Let's create Table-1
+
+We will use `gtsummary` package for creating descriptive table. Our task is to make a table for variables age, sex, CSF parameters (gl- glucose, pr- protein, whites- total leukocytes in CSF, polys- % of PMN in CSF) and presence or absence of acute bacterial meningitis (abm).
+
+```{r}
+library(gtsummary)
+Table_1 <- df_abm |> 
+  select(age,sex, gl, pr, whites, polys, abm) |> 
+  tbl_summary(missing_text = "missing data")
+Table_1
+```
+
+Let's ignore missing and add number of actual
+
+```{r}
+Table_1 <- df_abm |> 
+  select(age,sex, gl, pr, whites, polys, abm) |> 
+  tbl_summary(missing = "no") |> 
+  add_n()
+Table_1
+```
+
+## Let's create Table-2
+
+Now we will create a table showing comparison of these characteristics among those who have acute bacterial meningitis and those who do not have. First we will convert `abm` as `factor` variable and assign labels to levels 0 and 1 as "No ABM" and "ABM"
+
+```{r}
+df_abm <- df_abm |> 
+  mutate(abm=factor(abm, levels = c(0,1), labels = c("No ABM", "ABM")))
+```
+
+```{r}
+Table_2 <- df_abm |> 
+  select(age,sex, gl, pr, whites, polys, abm) |> 
+  tbl_summary(missing = "no",
+              by=abm) |> 
+  add_n()
+Table_2
+```
+
+Look at the warning. It shows number of observations excluded because they were missing in `by` variable. To include those we have to use `mutate()` and force missing data to be explicitly mentioned as NA by using `forcats::fct_explicit_na()` on `abm` column before passing to `tbl_summary()`. Let's do it
+
+```{r}
+Table_2 <- df_abm |> 
+  select(age,sex, gl, pr, whites, polys, abm) |> 
+  mutate(abm=fct_explicit_na(abm)) |> 
+  tbl_summary(missing = "no",
+              by=abm) |> 
+  add_n()
+Table_2
+```
+
+We will ignore 80 observations without outcome in further analysis.
+
+```{r}
+df_abm <- df_abm |> 
+  filter(!(is.na(abm)))
+```
+
+Now let us decide which statistical tests to be applied for comparing distribution of each of these variables across outcome categories. For this we have to check distributions of numeric variables. Plot for csf glucose
+
+```{r}
+plot_glucose <- df_abm |> 
+  ggplot(aes(x=gl, fill=abm))+
+  geom_density(alpha=0.5)+
+  theme_minimal()
+plot_glucose
+```
+
+Plot for csf protein
+
+```{r}
+plot_protein <- df_abm |> 
+  ggplot(aes(x=pr, fill=abm))+
+  geom_density(alpha=0.5)+
+  theme_minimal()
+plot_protein
+```
+
+Plot for csf WBCs
+
+```{r}
+plot_wbc <- df_abm |> 
+  ggplot(aes(x=whites, fill=abm))+
+  geom_density(alpha=0.5)+
+  theme_minimal()
+plot_wbc
+```
+
+There are outliers let's put a limit on x-axis by using `coord_cartesian()` function
+
+```{r}
+plot_wbc <- df_abm |> 
+  ggplot(aes(x=whites, fill=abm))+
+  geom_density(alpha=0.5)+
+  coord_cartesian(xlim = c(0, 15000))+
+  theme_minimal()
+plot_wbc
+```
+
+You can also use boxplot
+
+```{r}
+plot_wbc <- df_abm |> 
+  ggplot(aes(y=whites, fill=abm))+
+  geom_boxplot(alpha=0.5)+
+  coord_cartesian(ylim = c(0, 15000))+
+  theme_minimal()
+plot_wbc
+```
+
+Plot for % of PMNs
+
+```{r}
+plot_polys <- df_abm |> 
+  ggplot(aes(x=polys, fill=abm))+
+  geom_density(alpha=0.5)+
+  theme_minimal()
+plot_polys
+```
+
+What did you see in the visualizations. Data is quite skewed. You can get idea about this if you calculate standard deviations for these variables. These will be fairly large. Let's see
+
+```{r}
+Table_2 <- df_abm |> 
+  select(age,sex, gl, pr, whites, polys, abm) |> 
+  mutate(abm=fct_explicit_na(abm)) |> 
+  tbl_summary(missing = "no",
+              by=abm,
+              statistic = list(all_continuous()~ "{mean} ({sd})")) |> 
+  add_n()
+Table_2
+```
+
+We can see that standard deviations are larger for most and for some variables they are even larger than mean. This indicates that data is skewed and we should use non-parametric tests for comparing difference in the distribution. Now it's time to finally calculate the **p-value** , we will use `add_p()` from `gtsummary` to calculate p-value
+
+```{r}
+Table_2 <- df_abm |> 
+  select(age,sex, gl, pr, whites, polys, abm) |> 
+  mutate(abm=fct_explicit_na(abm)) |> 
+  tbl_summary(missing = "no",
+              by=abm) |> 
+  add_n() |> 
+  add_p()
+Table_2
+```
+
+`gtsummary` by default applied non-parametric test appropriately and we don't need to change them.

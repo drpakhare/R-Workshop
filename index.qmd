@@ -1,0 +1,11 @@
+---
+title: "R Workshop"
+---
+
+This website is developed for the Workshop on **Data Analysis with R for Biomedical Researchers** organized by the Department of Community and Family Medicine, All India Institute of Medical Sciences, Bhopal. This website will host the workshop resource materials.
+
+First workshop is scheduled on **11-14 Oct 2022.**
+
+![](images/1.jpg){fig-align="center"}
+
+![](images/2.jpg){fig-align="center"}

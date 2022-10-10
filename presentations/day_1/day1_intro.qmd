@@ -1,0 +1,129 @@
+---
+title: "."
+format: 
+    revealjs: 
+      slide-number: true
+      preview-links: auto
+      logo: ../../images/logo_112.jpeg
+      toc: true
+      toc-depth: 1
+      toc-title: "Outline"
+      title-slide-attributes: 
+        data-background-image: ../../images/Data Analysis with R.png
+        data-background-position: centre
+        data-background-size: 50%
+        data-background-repeat: FALSE
+editor: visual
+---
+
+# Why learn R?
+
+## It's open source = Free
+
+::: columns
+::: {.column width="50%"}
+```{r}
+library(webshot)
+webshot("https://www.r-project.org",
+        cliprect = "viewport",
+        file = "R.png")
+```
+:::
+
+::: {.column width="50%"}
+```{r}
+
+webshot("https://www.rstudio.com",
+        cliprect = "viewport",
+        file = "RStudio.png")
+```
+:::
+:::
+
+-   It's cross platform
+-   Works with all operating systems
+
+## Popular in academia \~ Trending
+
+-   Programming language but
+    -   natural language alike
+    -   functions- named, verbs
+    -   easy to guess and remember
+-   Non-computer science people can learn
+-   Documentation is vast
+
+## Reproducible research workflow
+
+-   Data wrangling
+-   Analysis scripts
+-   Report generation- publication ready tables and graphs
+-   Code sharing
+-   Version control
+-   Reproducible by anyone
+
+## Elegant visualizations or graphs
+
+![](/images/dv1.png)
+
+## Elegant visualizations or graphs
+
+![](/images/dv2.png)
+
+## Elegant visualizations or graphs
+
+![](/images/dv3.png)
+
+## Rich library / packages
+
+-   CRAN \~ Comprehensive R Archive Network
+-   Currently 18693 packages
+-   Range of topics
+    -   basic epidemiology to causal inference
+    -   pharmacokinetics to genomics
+    -   descriptive analysis to multi-variable
+    -   reporting templates etc
+
+## Non-statistical uses
+
+-   Since R is a programming language
+-   Develop websites
+-   Web Apps
+-   Dashboards
+-   Report and presentation
+-   Programming
+
+## R Community
+
+![](/images/Rcommunity.png)
+
+    -   https://blog.revolutionanalytics.com/2017/06/r-community.html
+
+# What you will learn?
+
+## By the end of workshop
+
+-   Use R and RStudio independently for
+-   Data cleaning, creating variables
+    -   Describing data
+    -   Descriptive statistics tables
+-   Exploratory plots showing distributions
+-   Apply appropriate statistical tests
+-   Create publication ready tables
+-   Create elegant, customized data visualizations
+-   Know ways to seek help and troubleshoot problems in R
+
+# Schedule outline
+
+-   Day-1: Installation and basic operations
+-   Day-2: Preparing data & grammer of graphics
+-   Day-3: Preparing tables, applying tests etc
+-   Day-4: Multivariable analysis & reproducible reporting
+
+# Types of activities
+
+-   Slide show
+-   Interactive tutorials (`swirl` and `RStudio Primers`)
+-   Live demo (Code-along sessions)
+-   Exercises- Coding practice by participants
+-   Code / Visualization challenges
+-   Video demonstrations

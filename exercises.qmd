@@ -1,0 +1,16 @@
+---
+title: "Practical Exercises"
+editor: visual
+---
+
++-------+----------------------+-------------------------------+-----------------------+
+| Day   | Exercise title       | Exercise File/Link            | Solution              |
++=======+======================+===============================+=======================+
+| Day-1 | Hands-on Basics of R | Interactive exercises         | Within exercises only |
+|       |                      |                               |                       |
+|       |                      | `swirl` interactive exercises |                       |
+|       |                      |                               |                       |
+|       |                      | RStudio primers               |                       |
++-------+----------------------+-------------------------------+-----------------------+
+| Day-1 | Importing datasets   | Ex- Import practice           | Sol- Import practice  |
++-------+----------------------+-------------------------------+-----------------------+

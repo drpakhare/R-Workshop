@@ -1,0 +1,9 @@
+---
+title: "Presentations / Slides"
+editor: visual
+---
+
+| Day   | Session                    | Link to presentation                         |
+|-----------------|----------------------------|----------------------------|
+| Day-1 | Introduction to workshop   | [Slides](presentations/day_1/day1_intro.qmd) |
+| Day-3 | Applying statistical tests | [Slides](presentations/day_3/d3.qmd)         |

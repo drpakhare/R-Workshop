@@ -1,0 +1,12 @@
+---
+title: "Regsitration"
+editor: visual
+---
+
+Registration is limited to 15 participants considering the hands-on nature of workshop. Participants will be selected on first-come first-serve basis.
+
+Registration fees- Rs 2950 (Rs 2500 + GST Rs 450)
+
+Registration form- [Click here](https://forms.gle/hj6tcYexrKNjRyRd8) or scan
+
+![](images/registration_qr.png){fig-align="center" width="222"}

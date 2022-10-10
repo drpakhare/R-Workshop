@@ -1,0 +1,1045 @@
+[
+  {
+    "objectID": "about.html",
+    "href": "about.html",
+    "title": "About Us",
+    "section": "",
+    "text": "Department of Community & Family Medicine\nDepartment has been pivotal in imparting research methodology, epidemiology and biostatistics trainings. It has a set up a computer laboratory and conducted workshops for faculty and SRs of the institute. Departmental faculty have expertise in advanced data analysis and open source softwares like Epi-Infor, Jamovi, Jasp, OpenEpi etc as well as R programming."
+  },
+  {
+    "objectID": "datasets.html",
+    "href": "datasets.html",
+    "title": "Datasets for practice",
+    "section": "",
+    "text": "Dataset Name\nBrief\nDownload Link\nSource Link\n\n\n\n\nabm\nAcute Bacterial Mengitis\nDownload\nSource\n\n\nanorexia\nWeight measurement before and after treatment of anorexia\nDownload\nSource\n\n\nanxiety\nAnxiety score measured at three time points\nDownload\nSource\n\n\nframingham\n\nDownload\nSource\n\n\nlead\nBlood lead levels in children of industrial worker and their matched control\nDownload\nSource"
+  },
+  {
+    "objectID": "day_3_statistical_tests.html#selection-of-test",
+    "href": "day_3_statistical_tests.html#selection-of-test",
+    "title": "Applying Tests of Significance",
+    "section": "Selection of test",
+    "text": "Selection of test"
+  },
+  {
+    "objectID": "day_3_statistical_tests.html#example-1",
+    "href": "day_3_statistical_tests.html#example-1",
+    "title": "Applying Tests of Significance",
+    "section": "Example-1",
+    "text": "Example-1\n\nLet us explore dataset from Framingham study\nIs there a difference in SBP among men and women?\n\n\n\nlibrary(here)\nlibrary(rio)\nlibrary(tidyverse)\ndf_framingham <- import(here(\"datasets\", \"framingham\", \"Framingham.Rdata\"))\nnames(df_framingham)\n\n\n [1] \"id\"       \"sex\"      \"sbp\"      \"dbp\"      \"scl\"      \"age\"     \n [7] \"bmi\"      \"month\"    \"followup\" \"chdfate\""
+  },
+  {
+    "objectID": "day_3_statistical_tests.html#check-distributions-histogram",
+    "href": "day_3_statistical_tests.html#check-distributions-histogram",
+    "title": "Applying Tests of Significance",
+    "section": "Check distributions (histogram)",
+    "text": "Check distributions (histogram)\n\n\nsbp_distribution <- ggplot(df_framingham, aes(x=sbp))+\n  geom_histogram(aes(y = ..density..))+\n  geom_density(colour=\"red\")\nsbp_distribution"
+  },
+  {
+    "objectID": "day_3_statistical_tests.html#check-distributions-q-q-plot",
+    "href": "day_3_statistical_tests.html#check-distributions-q-q-plot",
+    "title": "Applying Tests of Significance",
+    "section": "Check distributions (Q-Q plot)",
+    "text": "Check distributions (Q-Q plot)\n\nQ-Q plot by using qqnorm function\n\n\n\nqqnorm(df_framingham$sbp)"
+  },
+  {
+    "objectID": "day_3_statistical_tests.html#check-distributions",
+    "href": "day_3_statistical_tests.html#check-distributions",
+    "title": "Applying Tests of Significance",
+    "section": "Check distributions",
+    "text": "Check distributions\n\nLet us check distribution across gender\n\n\n\nsbp_distribution <- ggplot(df_framingham, aes(x=sbp))+\n  geom_histogram(aes(fill=factor(sex)), alpha=0.3) \nsbp_distribution"
+  },
+  {
+    "objectID": "day_3_statistical_tests.html#test-for-normality",
+    "href": "day_3_statistical_tests.html#test-for-normality",
+    "title": "Applying Tests of Significance",
+    "section": "Test for normality",
+    "text": "Test for normality\n\nthis is done by using Shapiro-Wilk Normality Test available through shapiro.test function of base R\n\n\n\nshapiro.test(df_framingham$sbp)\n\n\n\n    Shapiro-Wilk normality test\n\ndata:  df_framingham$sbp\nW = 0.92458, p-value < 2.2e-16"
+  },
+  {
+    "objectID": "day_3_statistical_tests.html#wilcoxan-rank-sum-test",
+    "href": "day_3_statistical_tests.html#wilcoxan-rank-sum-test",
+    "title": "Applying Tests of Significance",
+    "section": "Wilcoxan rank-sum test",
+    "text": "Wilcoxan rank-sum test\n\nbase R provides functions for many statistical tests\nwe will compute Wilcoxan rank-sum test by using wilcox.test function of base R\n\n\nwilcox.test(sbp ~ sex, data = df_framingham)\n\n\n    Wilcoxon rank sum test with continuity correction\n\ndata:  sbp by sex\nW = 2766638, p-value = 0.2619\nalternative hypothesis: true location shift is not equal to 0"
+  },
+  {
+    "objectID": "day_3_statistical_tests.html#t-test",
+    "href": "day_3_statistical_tests.html#t-test",
+    "title": "Applying Tests of Significance",
+    "section": "t-test",
+    "text": "t-test\n\nfor comparing two means we can use t.test function\n\n\nt.test(sbp ~ sex, data = df_framingham)\n\n\n    Welch Two Sample t-test\n\ndata:  sbp by sex\nt = -1.7669, df = 4694.3, p-value = 0.07731\nalternative hypothesis: true difference in means between group 1 and group 2 is not equal to 0\n95 percent confidence interval:\n -2.4274342  0.1260671\nsample estimates:\nmean in group 1 mean in group 2 \n       132.1176        133.2683"
+  },
+  {
+    "objectID": "day_3_statistical_tests.html#compare-two-groups--using-gtsummary",
+    "href": "day_3_statistical_tests.html#compare-two-groups--using-gtsummary",
+    "title": "Applying Tests of Significance",
+    "section": "Compare two groups- using gtsummary",
+    "text": "Compare two groups- using gtsummary\n\nwe need to compare many numerical variables\ne.g. dbp, cholesterol in this case\nand present it in tidy format\ngtsummary package\nadd_p() function"
+  },
+  {
+    "objectID": "day_3_statistical_tests.html#compare-two-groups--using-gtsummary-1",
+    "href": "day_3_statistical_tests.html#compare-two-groups--using-gtsummary-1",
+    "title": "Applying Tests of Significance",
+    "section": "Compare two groups- using gtsummary",
+    "text": "Compare two groups- using gtsummary\n\n\nlibrary(gtsummary)\ndf_framingham |> \n  select(-id,\n         -followup) |> \n  tbl_summary(by=sex) \n\n\n\n\n\n\n  \n  \n    \n      Characteristic\n      1, N = 2,0491\n      2, N = 2,6501\n    \n  \n  \n    sbp\n130 (120, 142)\n128 (115, 146)\n    dbp\n82 (75, 90)\n80 (72, 89)\n    scl\n225 (200, 250)\n225 (196, 258)\n        Unknown\n7\n26\n    age\n45 (38, 53)\n45 (39, 53)\n    bmi\n25.8 (23.6, 28.1)\n24.5 (22.3, 27.9)\n        Unknown\n2\n7\n    month\n6 (3, 10)\n6 (3, 10)\n    chdfate\n823 (40%)\n650 (25%)\n  \n  \n  \n    \n      1 Median (IQR); n (%)"
+  },
+  {
+    "objectID": "day_3_statistical_tests.html#compare-two-groups--using-gtsummary-2",
+    "href": "day_3_statistical_tests.html#compare-two-groups--using-gtsummary-2",
+    "title": "Applying Tests of Significance",
+    "section": "Compare two groups- using gtsummary",
+    "text": "Compare two groups- using gtsummary\n\n\nlibrary(gtsummary)\ndf_framingham |> \n  select(-id,\n         -followup) |> \n  tbl_summary(by=sex) |> \n  add_p()\n\n\n\n\n\n\n  \n  \n    \n      Characteristic\n      1, N = 2,0491\n      2, N = 2,6501\n      p-value2\n    \n  \n  \n    sbp\n130 (120, 142)\n128 (115, 146)\n0.3\n    dbp\n82 (75, 90)\n80 (72, 89)\n<0.001\n    scl\n225 (200, 250)\n225 (196, 258)\n0.6\n        Unknown\n7\n26\n\n    age\n45 (38, 53)\n45 (39, 53)\n0.091\n    bmi\n25.8 (23.6, 28.1)\n24.5 (22.3, 27.9)\n<0.001\n        Unknown\n2\n7\n\n    month\n6 (3, 10)\n6 (3, 10)\n0.9\n    chdfate\n823 (40%)\n650 (25%)\n<0.001\n  \n  \n  \n    \n      1 Median (IQR); n (%)\n    \n    \n      2 Wilcoxon rank sum test; Pearson's Chi-squared test"
+  },
+  {
+    "objectID": "day_3_statistical_tests.html#compare-two-groups--change-test",
+    "href": "day_3_statistical_tests.html#compare-two-groups--change-test",
+    "title": "Applying Tests of Significance",
+    "section": "Compare two groups- change test",
+    "text": "Compare two groups- change test\n\n\nlibrary(gtsummary)\ndf_framingham |> \n  select(-id,\n         -followup) |> \n  tbl_summary(by=sex,\n              statistic = list(all_continuous()~ \"{mean} ({sd})\")) |> \n  add_p(list(all_continuous() ~ \"t.test\")) \n\n\n\n\n\n\n  \n  \n    \n      Characteristic\n      1, N = 2,0491\n      2, N = 2,6501\n      p-value2\n    \n  \n  \n    sbp\n132 (20)\n133 (25)\n0.077\n    dbp\n83 (12)\n82 (13)\n<0.001\n    scl\n227 (42)\n229 (46)\n0.12\n        Unknown\n7\n26\n\n    age\n46 (8)\n46 (9)\n0.082\n    bmi\n26.0 (3.4)\n25.4 (4.6)\n<0.001\n        Unknown\n2\n7\n\n    month\n6 (4)\n6 (4)\n0.8\n    chdfate\n823 (40%)\n650 (25%)\n<0.001\n  \n  \n  \n    \n      1 Mean (SD); n (%)\n    \n    \n      2 Welch Two Sample t-test; Pearson's Chi-squared test\n    \n  \n\n\n\n\n\n\nlet us change type of statistical test\nit is done by assigning tests in add_p function"
+  },
+  {
+    "objectID": "day_3_statistical_tests.html#difference-in-two-types-of-tests",
+    "href": "day_3_statistical_tests.html#difference-in-two-types-of-tests",
+    "title": "Applying Tests of Significance",
+    "section": "Difference in two types of tests",
+    "text": "Difference in two types of tests\n\n\n\n\n\n\n  \n  \n    \n      Characteristic\n      \n        t-test\n      \n      \n        Wilcoxan rank-sum test\n      \n    \n    \n      1, N = 2,0491\n      2, N = 2,6501\n      p-value2\n      1, N = 2,0493\n      2, N = 2,6503\n      p-value4\n    \n  \n  \n    sbp\n132 (20)\n133 (25)\n0.077\n130 (120, 142)\n128 (115, 146)\n0.262\n    dbp\n83 (12)\n82 (13)\n<0.001\n82 (75, 90)\n80 (72, 89)\n<0.001\n    scl\n227 (42)\n229 (46)\n0.125\n225 (200, 250)\n225 (196, 258)\n0.601\n        Unknown\n7\n26\n\n7\n26\n\n    age\n46 (8)\n46 (9)\n0.082\n45 (38, 53)\n45 (39, 53)\n0.091\n    bmi\n26.0 (3.4)\n25.4 (4.6)\n<0.001\n25.8 (23.6, 28.1)\n24.5 (22.3, 27.9)\n<0.001\n        Unknown\n2\n7\n\n2\n7\n\n    month\n6 (4)\n6 (4)\n0.778\n6 (3, 10)\n6 (3, 10)\n0.890\n    chdfate\n823 (40%)\n650 (25%)\n<0.001\n823 (40%)\n650 (25%)\n<0.001\n  \n  \n  \n    \n      1 Mean (SD); n (%)\n    \n    \n      2 Welch Two Sample t-test; Pearson's Chi-squared test\n    \n    \n      3 Median (IQR); n (%)\n    \n    \n      4 Wilcoxon rank sum test; Pearson's Chi-squared test"
+  },
+  {
+    "objectID": "day_3_statistical_tests.html#compare-groups--graphs-tests-together-ggstatplot",
+    "href": "day_3_statistical_tests.html#compare-groups--graphs-tests-together-ggstatplot",
+    "title": "Applying Tests of Significance",
+    "section": "Compare groups- graphs & tests together ggstatplot",
+    "text": "Compare groups- graphs & tests together ggstatplot\n\nlibrary(ggstatsplot)\ndf_framingham |> \n  ggbetweenstats(x=sex,\n                 y=sbp)"
+  },
+  {
+    "objectID": "day_3_statistical_tests.html#graphs-tests-together-ggstatplot",
+    "href": "day_3_statistical_tests.html#graphs-tests-together-ggstatplot",
+    "title": "Applying Tests of Significance",
+    "section": "Graphs & tests together ggstatplot",
+    "text": "Graphs & tests together ggstatplot\n\n\nCode\nlibrary(ggstatsplot)\ndf_framingham |> \n  ggbetweenstats(x=sex,\n                 y=sbp,\n                 plot.type = \"box\",\n                 type = \"nonparametric\",\n                 point.args = list(position = ggplot2::position_jitterdodge(dodge.width = 0.6), alpha =\n    0.1, size = 0.5, stroke = 0))"
+  },
+  {
+    "objectID": "day_3_statistical_tests.html#selection-of-test-1",
+    "href": "day_3_statistical_tests.html#selection-of-test-1",
+    "title": "Applying Tests of Significance",
+    "section": "Selection of test",
+    "text": "Selection of test\n\ndistribution of data\nequality of variances\nParametric or non-skewed\n  One-Way Analysis of Variance (ANOVA)\n  Felch-ANOVA (Unequal variances)\nKruskal-Wallis Test"
+  },
+  {
+    "objectID": "day_3_statistical_tests.html#example-2",
+    "href": "day_3_statistical_tests.html#example-2",
+    "title": "Applying Tests of Significance",
+    "section": "Example-2",
+    "text": "Example-2\nLet us create varaible with 3 categories from variable bmi\n\ndf_framingham <- df_framingham |> \n  mutate(bmi_cat = case_when(\n    bmi <= 25 ~ \"<=25\",\n    (bmi>25 & bmi<=30) ~ \"Overweight\",\n    bmi >30 ~ \"Obese\"\n  )) |> \n  mutate(bmi_cat = factor(bmi_cat,\n                          levels = c(\"<=25\",\n                                     \"Overweight\",\n                                     \"Obese\"))) |> \n  drop_na()"
+  },
+  {
+    "objectID": "day_3_statistical_tests.html#check-distributions-density-curves",
+    "href": "day_3_statistical_tests.html#check-distributions-density-curves",
+    "title": "Applying Tests of Significance",
+    "section": "Check distributions (Density curves)",
+    "text": "Check distributions (Density curves)\n\nggplot(data = df_framingham, aes(x=sbp))+\n  geom_density(aes(fill=bmi_cat), alpha=0.3)"
+  },
+  {
+    "objectID": "day_3_statistical_tests.html#check-distributions-box-plots",
+    "href": "day_3_statistical_tests.html#check-distributions-box-plots",
+    "title": "Applying Tests of Significance",
+    "section": "Check distributions (Box-plots)",
+    "text": "Check distributions (Box-plots)\n\nggplot(data = df_framingham, aes(y=sbp, x=bmi_cat))+\n  geom_boxplot(aes(fill=bmi_cat), alpha=0.3)+\n  theme_ggstatsplot()"
+  },
+  {
+    "objectID": "day_3_statistical_tests.html#check-distributions-shapiro-wilk-test",
+    "href": "day_3_statistical_tests.html#check-distributions-shapiro-wilk-test",
+    "title": "Applying Tests of Significance",
+    "section": "Check distributions (Shapiro-Wilk Test)",
+    "text": "Check distributions (Shapiro-Wilk Test)\n\nnormality_test <- df_framingham |> split(~bmi_cat) %>%\n  map(~ shapiro.test(.x$sbp))\nnormality_test\n\n$`<=25`\n\n    Shapiro-Wilk normality test\n\ndata:  .x$sbp\nW = 0.90567, p-value < 2.2e-16\n\n\n$Overweight\n\n    Shapiro-Wilk normality test\n\ndata:  .x$sbp\nW = 0.92473, p-value < 2.2e-16\n\n\n$Obese\n\n    Shapiro-Wilk normality test\n\ndata:  .x$sbp\nW = 0.94307, p-value = 4.645e-14"
+  },
+  {
+    "objectID": "day_3_statistical_tests.html#kruskal-wallis-test",
+    "href": "day_3_statistical_tests.html#kruskal-wallis-test",
+    "title": "Applying Tests of Significance",
+    "section": "Kruskal-Wallis test",
+    "text": "Kruskal-Wallis test\n\nkruskal.test(sbp ~ bmi_cat, data = df_framingham)\n\n\n    Kruskal-Wallis rank sum test\n\ndata:  sbp by bmi_cat\nKruskal-Wallis chi-squared = 465.5, df = 2, p-value < 2.2e-16"
+  },
+  {
+    "objectID": "day_3_statistical_tests.html#pair-wise-comparisons",
+    "href": "day_3_statistical_tests.html#pair-wise-comparisons",
+    "title": "Applying Tests of Significance",
+    "section": "Pair-wise comparisons",
+    "text": "Pair-wise comparisons\n\npost-hoc tests\nwhen initial test indicates difference in distribution\nmany tests\nDunn’s test for non-parametric"
+  },
+  {
+    "objectID": "day_3_statistical_tests.html#pair-wise-comparisons-1",
+    "href": "day_3_statistical_tests.html#pair-wise-comparisons-1",
+    "title": "Applying Tests of Significance",
+    "section": "Pair-wise comparisons",
+    "text": "Pair-wise comparisons\n\nlibrary(PMCMRplus)\nkwAllPairsDunnTest(sbp ~ bmi_cat, data = df_framingham)\n\n           <=25   Overweight\nOverweight <2e-16 -         \nObese      <2e-16 <2e-16    \n\n\n\n\nsummary(kwAllPairsDunnTest(sbp ~ bmi_cat, data = df_framingham))\n\n                        z value   Pr(>|z|)    \nOverweight - <=25 == 0   15.136 < 2.22e-16 ***\nObese - <=25 == 0        19.217 < 2.22e-16 ***\nObese - Overweight == 0   8.790 < 2.22e-16 ***"
+  },
+  {
+    "objectID": "day_3_statistical_tests.html#one-way-anova",
+    "href": "day_3_statistical_tests.html#one-way-anova",
+    "title": "Applying Tests of Significance",
+    "section": "One way ANOVA",
+    "text": "One way ANOVA\n\naov(sbp ~ bmi_cat, data = df_framingham)\n\nCall:\n   aov(formula = sbp ~ bmi_cat, data = df_framingham)\n\nTerms:\n                  bmi_cat Residuals\nSum of Squares   208072.2 2211993.3\nDeg. of Freedom         2      4655\n\nResidual standard error: 21.79877\nEstimated effects may be unbalanced\n\n\n\n\nsummary.aov(aov(sbp ~ bmi_cat, data = df_framingham))\n\n              Df  Sum Sq Mean Sq F value Pr(>F)    \nbmi_cat        2  208072  104036   218.9 <2e-16 ***\nResiduals   4655 2211993     475                   \n---\nSignif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1"
+  },
+  {
+    "objectID": "day_3_statistical_tests.html#pair-wise-comparison-after-anova",
+    "href": "day_3_statistical_tests.html#pair-wise-comparison-after-anova",
+    "title": "Applying Tests of Significance",
+    "section": "Pair-wise comparison after ANOVA",
+    "text": "Pair-wise comparison after ANOVA\n\npair wise t tests with Bonferroni correction\n\n\nwith (df_framingham, pairwise.t.test(sbp, bmi_cat,  p.adjust.method = \"bonf\"))\n\n\n    Pairwise comparisons using t tests with pooled SD \n\ndata:  sbp and bmi_cat \n\n           <=25   Overweight\nOverweight <2e-16 -         \nObese      <2e-16 <2e-16    \n\nP value adjustment method: bonferroni"
+  },
+  {
+    "objectID": "day_3_statistical_tests.html#graphs-and-stats-together",
+    "href": "day_3_statistical_tests.html#graphs-and-stats-together",
+    "title": "Applying Tests of Significance",
+    "section": "Graphs and stats together",
+    "text": "Graphs and stats together\n\n\nCode\nggstatsplot::ggbetweenstats(data = df_framingham,\n                        x=bmi_cat,\n                        y=sbp,\n                        plot.type = \"box\",\n                 type = \"nonparametric\",\n                 point.args = list(position = ggplot2::position_jitterdodge(dodge.width = 0.6), alpha =\n    0.1, size = 0.5, stroke = 0))"
+  },
+  {
+    "objectID": "day_3_statistical_tests.html#graphs-and-stats-together-parametric",
+    "href": "day_3_statistical_tests.html#graphs-and-stats-together-parametric",
+    "title": "Applying Tests of Significance",
+    "section": "Graphs and stats together (Parametric)",
+    "text": "Graphs and stats together (Parametric)\n\n\nCode\nggstatsplot::ggbetweenstats(data = df_framingham,\n                        x=bmi_cat,\n                        y=sbp,\n                        plot.type = \"box\",\n                 type = \"parametric\",\n                 point.args = list(position = ggplot2::position_jitterdodge(dodge.width = 0.6), alpha =\n    0.1, size = 0.5, stroke = 0))"
+  },
+  {
+    "objectID": "day_3_statistical_tests.html#using-gtsummary",
+    "href": "day_3_statistical_tests.html#using-gtsummary",
+    "title": "Applying Tests of Significance",
+    "section": "Using gtsummary",
+    "text": "Using gtsummary\n\n\nCode\ndf_framingham |> gtsummary::tbl_summary(\n  by = bmi_cat,\n  include = (c( sbp, dbp, scl)),\n  digits = list(all_continuous()~c(1,1))\n) |> \n  add_p()\n\n\n\n\n\n\n  \n  \n    \n      Characteristic\n      <=25, N = 2,2621\n      Overweight, N = 1,8201\n      Obese, N = 5761\n      p-value2\n    \n  \n  \n    sbp\n124.0 (112.0, 136.0)\n132.0 (120.0, 146.0)\n142.0 (130.0, 160.0)\n<0.001\n    dbp\n78.0 (70.0, 84.0)\n84.0 (78.0, 92.0)\n90.0 (82.0, 98.0)\n<0.001\n    scl\n217.0 (192.0, 246.0)\n230.0 (202.0, 260.0)\n234.0 (209.0, 262.2)\n<0.001\n  \n  \n  \n    \n      1 Median (IQR)\n    \n    \n      2 Kruskal-Wallis rank sum test"
+  },
+  {
+    "objectID": "day_3_statistical_tests.html#using-gtsummary-compare-against-reference",
+    "href": "day_3_statistical_tests.html#using-gtsummary-compare-against-reference",
+    "title": "Applying Tests of Significance",
+    "section": "Using gtsummary (Compare against reference)",
+    "text": "Using gtsummary (Compare against reference)\n\n\nCode\n# table summarizing data\nt0 <- df_framingham |> gtsummary::tbl_summary(\n  by = bmi_cat,\n  include = (c( sbp, dbp, scl)),\n  digits = list(all_continuous()~c(1,1))) \n\n# table comparing <=25 with Overweight\nt1 <- df_framingham |> \n  filter(bmi_cat %in% c(\"<=25\", \"Overweight\")) |> \n  tbl_summary(by = bmi_cat, missing = \"no\",\n              include = (c( sbp, dbp, scl))) |> \n  add_p() |> \n  modify_header(p.value ~ (\"**<=25 vs. Overweight**\")) |> \n  # hide summary stat columns\n  modify_column_hide(all_stat_cols())\n\n# table comparing <=25 with Obese\nt2 <- df_framingham |> \n  filter(bmi_cat %in% c(\"<=25\", \"Obese\")) |> \n  tbl_summary(by = bmi_cat, missing = \"no\",\n              include = (c( sbp, dbp, scl))) |> \n  add_p() |> \n  modify_header(p.value ~ (\"**<=25 vs. Obese**\")) |> \n  # hide summary stat columns\n  modify_column_hide(all_stat_cols())\n\n# merging the 3 tables together, and adding additional gt formatting\ntbl_merge(list(t0, t1, t2)) %>%\n  modify_spanning_header(\n    list(\n      all_stat_cols() ~ \"**BMI Groups**\",\n      starts_with(\"p.value\") ~ \"**p-values**\"\n    )\n  )\n\n\n\n\n\n\n  \n  \n    \n      Characteristic\n      \n        BMI Groups\n      \n      \n        p-values\n      \n    \n    \n      <=25, N = 2,2621\n      Overweight, N = 1,8201\n      Obese, N = 5761\n      <=25 vs. Overweight2\n      <=25 vs. Obese2\n    \n  \n  \n    sbp\n124.0 (112.0, 136.0)\n132.0 (120.0, 146.0)\n142.0 (130.0, 160.0)\n<0.001\n<0.001\n    dbp\n78.0 (70.0, 84.0)\n84.0 (78.0, 92.0)\n90.0 (82.0, 98.0)\n<0.001\n<0.001\n    scl\n217.0 (192.0, 246.0)\n230.0 (202.0, 260.0)\n234.0 (209.0, 262.2)\n<0.001\n<0.001\n  \n  \n  \n    \n      1 Median (IQR)\n    \n    \n      2 Wilcoxon rank sum test"
+  },
+  {
+    "objectID": "day_3_statistical_tests.html#categorical-or-nominal-variables",
+    "href": "day_3_statistical_tests.html#categorical-or-nominal-variables",
+    "title": "Applying Tests of Significance",
+    "section": "Categorical or nominal variables",
+    "text": "Categorical or nominal variables\n\nNominal or categorical variables - summarized as proportion\nMany clinical outcomes are presented as binary or categorical variable for ease of interpretation\nBlood pressure readings are converted to categorical- Presence or absence of hypertension\nOur interest lies in knowing if one group has more proportion of an outcome than other group"
+  },
+  {
+    "objectID": "day_3_statistical_tests.html#selection-of-test-2",
+    "href": "day_3_statistical_tests.html#selection-of-test-2",
+    "title": "Applying Tests of Significance",
+    "section": "Selection of test",
+    "text": "Selection of test\n\nTwo independent groups\n  Chi-square test\n  Difference in two proportions\n  Fisher's exact test (expected freq <5)\nPaired or non-independent observations\n  binary or two categories- McNemar test\n  >2 categories- Cochran's Q"
+  },
+  {
+    "objectID": "day_3_statistical_tests.html#example--3",
+    "href": "day_3_statistical_tests.html#example--3",
+    "title": "Applying Tests of Significance",
+    "section": "Example- 3",
+    "text": "Example- 3\n\nLet’s create variable ‘bp_categories’ from sbp and dbp\n\n\ndf_framingham <-  df_framingham |> \n  mutate(bp_categories= case_when(\n    (sbp>=140 | dbp>=90) ~ \"hypertension\",\n    (sbp<140 & sbp>=120) |(dbp<90 & dbp>=80) ~ \"elevated BP\",\n    (sbp<120 & dbp<80) ~ \"normotensive\"\n  )) |> \n  mutate(bp_categories=factor(bp_categories,\n                              levels = c(\"normotensive\",\n                                         \"elevated BP\",\n                                         \"hypertension\"),\n                              labels = c(\"Normotensive\",\n                                         \"Elevated BP\",\n                                         \"Hypertension\")))"
+  },
+  {
+    "objectID": "day_3_statistical_tests.html#apply-chi-square-test",
+    "href": "day_3_statistical_tests.html#apply-chi-square-test",
+    "title": "Applying Tests of Significance",
+    "section": "Apply Chi-square test",
+    "text": "Apply Chi-square test\n\ntable(df_framingham$bmi_cat, df_framingham$bp_categories)\n\n            \n             Normotensive Elevated BP Hypertension\n  <=25                798         902          562\n  Overweight          289         713          818\n  Obese                36         160          380\n\n\n\n\nchisq.test(df_framingham$bmi_cat, df_framingham$bp_categories)\n\n\n    Pearson's Chi-squared test\n\ndata:  df_framingham$bmi_cat and df_framingham$bp_categories\nX-squared = 508.96, df = 4, p-value < 2.2e-16\n\n\n\n\n\nwith(df_framingham, chisq.test(bmi_cat, bp_categories))\n\n\n    Pearson's Chi-squared test\n\ndata:  bmi_cat and bp_categories\nX-squared = 508.96, df = 4, p-value < 2.2e-16"
+  },
+  {
+    "objectID": "day_3_statistical_tests.html#apply-chi-square-test-1",
+    "href": "day_3_statistical_tests.html#apply-chi-square-test-1",
+    "title": "Applying Tests of Significance",
+    "section": "Apply Chi-square test",
+    "text": "Apply Chi-square test\n\n\nlibrary(gtsummary)\ndf_framingham |> \n  tbl_summary(by=bp_categories,\n              include = c(sex, bmi_cat),\n              digits = list(all_categorical() ~ c(0,1)))\n\n\n\n\n\n\n  \n  \n    \n      Characteristic\n      Normotensive, N = 1,1231\n      Elevated BP, N = 1,7751\n      Hypertension, N = 1,7601\n    \n  \n  \n    sex\n\n\n\n        1\n403 (35.9%)\n834 (47.0%)\n803 (45.6%)\n        2\n720 (64.1%)\n941 (53.0%)\n957 (54.4%)\n    bmi_cat\n\n\n\n        <=25\n798 (71.1%)\n902 (50.8%)\n562 (31.9%)\n        Overweight\n289 (25.7%)\n713 (40.2%)\n818 (46.5%)\n        Obese\n36 (3.2%)\n160 (9.0%)\n380 (21.6%)\n  \n  \n  \n    \n      1 n (%)"
+  },
+  {
+    "objectID": "day_3_statistical_tests.html#apply-chi-square-test-2",
+    "href": "day_3_statistical_tests.html#apply-chi-square-test-2",
+    "title": "Applying Tests of Significance",
+    "section": "Apply Chi-square test",
+    "text": "Apply Chi-square test\n\n\nlibrary(gtsummary)\ndf_framingham |> \n  tbl_summary(by=bp_categories,\n              include = c(sex, bmi_cat),\n              digits = list(all_categorical() ~ c(0,1))) |> \n  add_p()\n\n\n\n\n\n\n  \n  \n    \n      Characteristic\n      Normotensive, N = 1,1231\n      Elevated BP, N = 1,7751\n      Hypertension, N = 1,7601\n      p-value2\n    \n  \n  \n    sex\n\n\n\n<0.001\n        1\n403 (35.9%)\n834 (47.0%)\n803 (45.6%)\n\n        2\n720 (64.1%)\n941 (53.0%)\n957 (54.4%)\n\n    bmi_cat\n\n\n\n<0.001\n        <=25\n798 (71.1%)\n902 (50.8%)\n562 (31.9%)\n\n        Overweight\n289 (25.7%)\n713 (40.2%)\n818 (46.5%)\n\n        Obese\n36 (3.2%)\n160 (9.0%)\n380 (21.6%)\n\n  \n  \n  \n    \n      1 n (%)\n    \n    \n      2 Pearson's Chi-squared test"
+  },
+  {
+    "objectID": "day_3_statistical_tests.html#apply-chi-square-test-3",
+    "href": "day_3_statistical_tests.html#apply-chi-square-test-3",
+    "title": "Applying Tests of Significance",
+    "section": "Apply Chi-square test",
+    "text": "Apply Chi-square test\n\n\nlibrary(gtsummary)\ndf_framingham |> \n  tbl_summary(by=bp_categories,\n              percent = \"row\",\n              include = c(sex, bmi_cat),\n              digits = list(all_categorical() ~ c(0,1))) |> \n  add_p() \n\n\n\n\n\n\n  \n  \n    \n      Characteristic\n      Normotensive, N = 1,1231\n      Elevated BP, N = 1,7751\n      Hypertension, N = 1,7601\n      p-value2\n    \n  \n  \n    sex\n\n\n\n<0.001\n        1\n403 (19.8%)\n834 (40.9%)\n803 (39.4%)\n\n        2\n720 (27.5%)\n941 (35.9%)\n957 (36.6%)\n\n    bmi_cat\n\n\n\n<0.001\n        <=25\n798 (35.3%)\n902 (39.9%)\n562 (24.8%)\n\n        Overweight\n289 (15.9%)\n713 (39.2%)\n818 (44.9%)\n\n        Obese\n36 (6.2%)\n160 (27.8%)\n380 (66.0%)\n\n  \n  \n  \n    \n      1 n (%)\n    \n    \n      2 Pearson's Chi-squared test\n    \n  \n\n\n\n\n\n\npercentages changed to row percent"
+  },
+  {
+    "objectID": "day_3_statistical_tests.html#apply-chi-square-test-4",
+    "href": "day_3_statistical_tests.html#apply-chi-square-test-4",
+    "title": "Applying Tests of Significance",
+    "section": "Apply Chi-square test",
+    "text": "Apply Chi-square test\n\n\nlibrary(gtsummary)\ndf_framingham |> \n  tbl_summary(by=bp_categories,\n              percent = \"row\",\n              statistic = list(all_categorical()~\"{n} ({p})\"),\n              include = c(sex, bmi_cat),\n              digits = list(all_categorical() ~ c(0,1))) |> \n  add_p() \n\n\n\n\n\n\n  \n  \n    \n      Characteristic\n      Normotensive, N = 1,1231\n      Elevated BP, N = 1,7751\n      Hypertension, N = 1,7601\n      p-value2\n    \n  \n  \n    sex\n\n\n\n<0.001\n        1\n403 (19.8)\n834 (40.9)\n803 (39.4)\n\n        2\n720 (27.5)\n941 (35.9)\n957 (36.6)\n\n    bmi_cat\n\n\n\n<0.001\n        <=25\n798 (35.3)\n902 (39.9)\n562 (24.8)\n\n        Overweight\n289 (15.9)\n713 (39.2)\n818 (44.9)\n\n        Obese\n36 (6.2)\n160 (27.8)\n380 (66.0)\n\n  \n  \n  \n    \n      1 n (%)\n    \n    \n      2 Pearson's Chi-squared test\n    \n  \n\n\n\n\n\n\npercent sign removed"
+  },
+  {
+    "objectID": "day_3_statistical_tests.html#graphs-and-stats-together-1",
+    "href": "day_3_statistical_tests.html#graphs-and-stats-together-1",
+    "title": "Applying Tests of Significance",
+    "section": "Graphs and stats together",
+    "text": "Graphs and stats together\n\n\nCode\nlibrary(ggstatsplot)\ndf_framingham |> \n  ggbarstats(x = bp_categories,\n             y = bmi_cat,\n             proportion.test = FALSE,\n             xlab = \"\",\n             legend.title = \"BP Categories\",\n             title = \"Association of BMI and BP Status\",\n             bf.message = FALSE,\n             ggtheme = ggthemes::theme_fivethirtyeight())"
+  },
+  {
+    "objectID": "day_3_statistical_tests.html#graphs-and-stats-together-2",
+    "href": "day_3_statistical_tests.html#graphs-and-stats-together-2",
+    "title": "Applying Tests of Significance",
+    "section": "Graphs and stats together",
+    "text": "Graphs and stats together\n\n\nCode\nlibrary(ggstatsplot)\ndf_framingham |> \n  mutate(sex = factor(sex, labels = c(\"Males\", \"Females\"))) |> \n  ggbarstats(x = bp_categories,\n             y = sex,\n             proportion.test = FALSE,\n             xlab = \"\",\n             legend.title = \"BP Categories\",\n             title = \"Association of Sex and BP Status\",\n             bf.message = FALSE,\n             ggtheme = ggthemes::theme_wsj())"
+  },
+  {
+    "objectID": "day_3_statistical_tests.html#comparing-two-related-or-paired-nominal-variables",
+    "href": "day_3_statistical_tests.html#comparing-two-related-or-paired-nominal-variables",
+    "title": "Applying Tests of Significance",
+    "section": "Comparing two related or paired nominal variables",
+    "text": "Comparing two related or paired nominal variables\n\nCategorical observation on same subject 2 or more times\n  Result of certain test as Pos/Neg at two different times\n  Result of two different tests on same subject at same time\n  Diagnostic research - new test vs reference\nPaired or matched observation\n  matched pair case-control studies\nLet’s explore with example"
+  },
+  {
+    "objectID": "day_3_statistical_tests.html#comparing-two-paired-nominal-observations",
+    "href": "day_3_statistical_tests.html#comparing-two-paired-nominal-observations",
+    "title": "Applying Tests of Significance",
+    "section": "Comparing two paired nominal observations",
+    "text": "Comparing two paired nominal observations\n\nDataset contains Blood lead levels data from Pruzek & Helmreich\n\n\n\n\n\nmatched paired data corresponding to blood lead levels for 33 children of parents who had worked in a lead related factory and 33 control children from their neighborhood\nBlood lead levels more than 20 ug/dL are categorized as “High”\nLet’s import dataset and view its head\n\n\ndf_lead <- import(here(\"datasets\", \"lead\", \"df_lead.rds\"))\nhead(df_lead, n=4)\n\n  Pair Exposed Control Exposed_Cat Control_Cat\n1  P01      38      16        High         Low\n2  P02      23      18        High         Low\n3  P03      41      18        High         Low\n4  P04      18      24         Low        High"
+  },
+  {
+    "objectID": "day_3_statistical_tests.html#mcnemar-test",
+    "href": "day_3_statistical_tests.html#mcnemar-test",
+    "title": "Applying Tests of Significance",
+    "section": "McNemar Test",
+    "text": "McNemar Test\n\ntable(df_lead$Exposed_Cat, df_lead$Control_Cat)\n\n      \n       High Low\n  High    3  23\n  Low     2   5\n\n\n\nresult <- mcnemar.test(df_lead$Exposed_Cat, df_lead$Control_Cat)\nresult\n\n\n    McNemar's Chi-squared test with continuity correction\n\ndata:  df_lead$Exposed_Cat and df_lead$Control_Cat\nMcNemar's chi-squared = 16, df = 1, p-value = 6.334e-05"
+  },
+  {
+    "objectID": "day_3_statistical_tests.html#mcnemar-test-in-gtsummary",
+    "href": "day_3_statistical_tests.html#mcnemar-test-in-gtsummary",
+    "title": "Applying Tests of Significance",
+    "section": "McNemar Test in gtsummary",
+    "text": "McNemar Test in gtsummary\n\nlibrary(gtsummary)\ndf_lead |> \n  tbl_summary(by=Control_Cat,\n              include = c(Exposed_Cat)) |> \n  add_p(test=all_categorical()~\"mcnemar.test.wide\") |> \n  modify_spanning_header(all_stat_cols()~ \"**Control_Cat**\")\n\n\n\n\n\n  \n  \n    \n      Characteristic\n      \n        Control_Cat\n      \n      p-value2\n    \n    \n      High, N = 51\n      Low, N = 281\n    \n  \n  \n    Exposed_Cat\n\n\n<0.001\n        High\n3 (60%)\n23 (82%)\n\n        Low\n2 (40%)\n5 (18%)\n\n  \n  \n  \n    \n      1 n (%)\n    \n    \n      2 McNemar's Chi-squared test with continuity correction"
+  },
+  {
+    "objectID": "day_3_statistical_tests.html#two-observations-before-after-type",
+    "href": "day_3_statistical_tests.html#two-observations-before-after-type",
+    "title": "Applying Tests of Significance",
+    "section": "Two observations (before-after type)",
+    "text": "Two observations (before-after type)\n\nNormally distributed- paired t-test\nSkewed- Wilcoxan Signed Rank Test\nExample- Dataset contain weights before and after treatment of anorexia\n  Let's load the data and view structure\n\n\ndf_anorexia <- import(here(\"datasets\", \"anorexia\", \"df_anorexia.rds\"))\nstr(df_anorexia)\n\n'data.frame':   72 obs. of  3 variables:\n $ Treat : Factor w/ 3 levels \"CBT\",\"Cont\",\"FT\": 2 2 2 2 2 2 2 2 2 2 ...\n $ Prewt : num  80.7 89.4 91.8 74 78.1 88.3 87.3 75.1 80.6 78.4 ...\n $ Postwt: num  80.2 80.1 86.4 86.3 76.1 78.1 75.1 86.7 73.5 84.6 ..."
+  },
+  {
+    "objectID": "day_3_statistical_tests.html#check-distributions-1",
+    "href": "day_3_statistical_tests.html#check-distributions-1",
+    "title": "Applying Tests of Significance",
+    "section": "Check distributions",
+    "text": "Check distributions\n\nPlot histograms (quickly)\n\n\nhist(df_anorexia$Prewt,  xlab = \"Pre Weight\")\n\nsummary(df_anorexia$Prewt)\n\n   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. \n  70.00   79.60   82.30   82.41   86.00   94.90"
+  },
+  {
+    "objectID": "day_3_statistical_tests.html#check-distributions-2",
+    "href": "day_3_statistical_tests.html#check-distributions-2",
+    "title": "Applying Tests of Significance",
+    "section": "Check distributions",
+    "text": "Check distributions\n\nhist(df_anorexia$Postwt,  xlab = \"Post Weight\")\n\nsummary(df_anorexia$Postwt)\n\n   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. \n  71.30   79.33   84.05   85.17   91.55  103.60"
+  },
+  {
+    "objectID": "day_3_statistical_tests.html#check-normality---shapiro-wilk-test",
+    "href": "day_3_statistical_tests.html#check-normality---shapiro-wilk-test",
+    "title": "Applying Tests of Significance",
+    "section": "Check normality - Shapiro-Wilk Test",
+    "text": "Check normality - Shapiro-Wilk Test\n\nshapiro.test(df_anorexia$Prewt)\n\n\n    Shapiro-Wilk normality test\n\ndata:  df_anorexia$Prewt\nW = 0.99248, p-value = 0.9484\n\n\n\n\nshapiro.test(df_anorexia$Postwt)\n\n\n    Shapiro-Wilk normality test\n\ndata:  df_anorexia$Postwt\nW = 0.9673, p-value = 0.05781"
+  },
+  {
+    "objectID": "day_3_statistical_tests.html#wilcoxan-signed-rank-test",
+    "href": "day_3_statistical_tests.html#wilcoxan-signed-rank-test",
+    "title": "Applying Tests of Significance",
+    "section": "Wilcoxan signed-rank test",
+    "text": "Wilcoxan signed-rank test\n\nwith(df_anorexia, wilcox.test(Postwt, Prewt, \n                              paired=TRUE))\n\n\n    Wilcoxon signed rank test with continuity correction\n\ndata:  Postwt and Prewt\nV = 1724.5, p-value = 0.0106\nalternative hypothesis: true location shift is not equal to 0\n\n# save it as result\nresult <- wilcox.test(df_anorexia$Postwt, df_anorexia$Prewt,\n                              paired=TRUE)\n\n. . . - Let’s use report package to understand results\n\nlibrary(report)\nreport(result)\n\nEffect sizes were labelled following Funder's (2019) recommendations.\n\nThe Wilcoxon signed rank test with continuity correction testing the difference\nin ranks between df_anorexia$Postwt and df_anorexia$Prewt suggests that the\neffect is positive, statistically significant, and large (W = 1724.50, p =\n0.011; r (rank biserial) = 0.35, 95% CI [0.10, 0.56])"
+  },
+  {
+    "objectID": "day_3_statistical_tests.html#paired-t-test",
+    "href": "day_3_statistical_tests.html#paired-t-test",
+    "title": "Applying Tests of Significance",
+    "section": "Paired t-test",
+    "text": "Paired t-test\n\nresult <- with(df_anorexia, t.test(Prewt, Postwt, paired=TRUE))\nresult\n\n\n    Paired t-test\n\ndata:  Prewt and Postwt\nt = -2.9376, df = 71, p-value = 0.004458\nalternative hypothesis: true mean difference is not equal to 0\n95 percent confidence interval:\n -4.6399424 -0.8878354\nsample estimates:\nmean difference \n      -2.763889 \n\n\n. . . - Let’s use report package to understand results\n\nlibrary(report)\nreport(result)\n\nEffect sizes were labelled following Cohen's (1988) recommendations.\n\nThe Paired t-test testing the difference between Prewt and Postwt (mean\ndifference = -2.76) suggests that the effect is negative, statistically\nsignificant, and small (difference = -2.76, 95% CI [-4.64, -0.89], t(71) =\n-2.94, p = 0.004; Cohen's d = -0.35, 95% CI [-0.59, -0.11])"
+  },
+  {
+    "objectID": "day_3_statistical_tests.html#paired-test-using-gtsummary",
+    "href": "day_3_statistical_tests.html#paired-test-using-gtsummary",
+    "title": "Applying Tests of Significance",
+    "section": "Paired test using gtsummary",
+    "text": "Paired test using gtsummary\n\nneeds data in long format\neach individual will have two readings . . .\n\n\nlibrary(tidyverse)\n# Convert row number to id\ndf_anorexia <- df_anorexia |> \n  rownames_to_column(var = \"id\") \nnames(df_anorexia)  \n\n[1] \"id\"     \"Treat\"  \"Prewt\"  \"Postwt\"\n\n\n\n\nUse pivot_longer function from dplyr\n\n\ndf_anorexia <- df_anorexia |> \n  pivot_longer(cols = c(Prewt, Postwt),\n               names_to = \"Time\",\n               values_to = \"Weight\")\nhead(df_anorexia, n=3)\n\n# A tibble: 3 × 4\n  id    Treat Time   Weight\n  <chr> <fct> <chr>   <dbl>\n1 1     Cont  Prewt    80.7\n2 1     Cont  Postwt   80.2\n3 2     Cont  Prewt    89.4"
+  },
+  {
+    "objectID": "day_3_statistical_tests.html#paired-test-using-gtsummary-1",
+    "href": "day_3_statistical_tests.html#paired-test-using-gtsummary-1",
+    "title": "Applying Tests of Significance",
+    "section": "Paired test using gtsummary",
+    "text": "Paired test using gtsummary\n\n\nT_Paired <- df_anorexia |> \n  tbl_summary(by=Time,\n              include = c(Weight))\nT_Paired\n\n\n\n\n\n\n  \n  \n    \n      Characteristic\n      Postwt, N = 721\n      Prewt, N = 721\n    \n  \n  \n    Weight\n84 (79, 92)\n82 (80, 86)\n  \n  \n  \n    \n      1 Median (IQR)"
+  },
+  {
+    "objectID": "day_3_statistical_tests.html#paired-test-using-gtsummary-2",
+    "href": "day_3_statistical_tests.html#paired-test-using-gtsummary-2",
+    "title": "Applying Tests of Significance",
+    "section": "Paired test using gtsummary",
+    "text": "Paired test using gtsummary\n\n\nT_Paired <- df_anorexia |> \n  tbl_summary(by=Time,\n              include = c(Weight)) |> \n  add_p()\nT_Paired\n\n\n\n\n\n\n  \n  \n    \n      Characteristic\n      Postwt, N = 721\n      Prewt, N = 721\n      p-value2\n    \n  \n  \n    Weight\n84 (79, 92)\n82 (80, 86)\n0.076\n  \n  \n  \n    \n      1 Median (IQR)\n    \n    \n      2 Wilcoxon rank sum test"
+  },
+  {
+    "objectID": "day_3_statistical_tests.html#paired-test-using-gtsummary-3",
+    "href": "day_3_statistical_tests.html#paired-test-using-gtsummary-3",
+    "title": "Applying Tests of Significance",
+    "section": "Paired test using gtsummary",
+    "text": "Paired test using gtsummary\n\n\nT_Paired <- df_anorexia |> \n  tbl_summary(by=Time,\n              include = c(Weight)) |> \n  add_p(test=all_continuous() ~ \"paired.wilcox.test\")\n\n\nThere was an error in 'add_p()/add_difference()' for variable 'Weight', p-value omitted:\nError: Paired tests require the `group=` argument.\n\nT_Paired\n\n\n\n\n\n  \n  \n    \n      Characteristic\n      Postwt, N = 721\n      Prewt, N = 721\n      p-value\n    \n  \n  \n    Weight\n84 (79, 92)\n82 (80, 86)\n\n  \n  \n  \n    \n      1 Median (IQR)\n    \n  \n\n\n\n\n\n. . . - map “group” to “id” variable\n\n\nT_Paired <- df_anorexia |> \n  tbl_summary(by=Time,\n              include = c(Weight)) |> \n  add_p(test=all_continuous() ~ \"paired.wilcox.test\", \n        group=\"id\")\nT_Paired\n\n\n\n\n\n\n  \n  \n    \n      Characteristic\n      Postwt, N = 721\n      Prewt, N = 721\n      p-value2\n    \n  \n  \n    Weight\n84 (79, 92)\n82 (80, 86)\n0.011\n  \n  \n  \n    \n      1 Median (IQR)\n    \n    \n      2 Wilcoxon signed rank test with continuity correction"
+  },
+  {
+    "objectID": "day_3_statistical_tests.html#paired-test-using-gtsummary-4",
+    "href": "day_3_statistical_tests.html#paired-test-using-gtsummary-4",
+    "title": "Applying Tests of Significance",
+    "section": "Paired test using gtsummary",
+    "text": "Paired test using gtsummary\n\nChange to paired.t.test\n\n\n\nT_Paired <- df_anorexia |> \n  tbl_summary(by=Time,\n              include = c(Weight),\n              statistic = list(all_continuous()~ \"{mean} ({sd})\")) |> \n  add_p(test=all_continuous() ~ \"paired.t.test\", \n        group=\"id\")\nT_Paired\n\n\n\n\n\n\n  \n  \n    \n      Characteristic\n      Postwt, N = 721\n      Prewt, N = 721\n      p-value2\n    \n  \n  \n    Weight\n85 (8)\n82 (5)\n0.004\n  \n  \n  \n    \n      1 Mean (SD)\n    \n    \n      2 Paired t-test\n    \n  \n\n\n\n\n\n. . . - use add_difference to have difference and p-value\n\n\nT_Paired <- df_anorexia |> \n  tbl_summary(by=Time,\n              include = c(Weight),\n              statistic = list(all_continuous()~ \"{mean} ({sd})\")) |> \n  add_difference(test=all_continuous() ~ \"paired.t.test\",\n                 group=\"id\")\nT_Paired\n\n\n\n\n\n\n  \n  \n    \n      Characteristic\n      Postwt, N = 721\n      Prewt, N = 721\n      Difference2\n      95% CI2,3\n      p-value2\n    \n  \n  \n    Weight\n85 (8)\n82 (5)\n-2.8\n-4.6, -0.89\n0.004\n  \n  \n  \n    \n      1 Mean (SD)\n    \n    \n      2 Paired t-test\n    \n    \n      3 CI = Confidence Interval"
+  },
+  {
+    "objectID": "day_3_statistical_tests.html#three-or-more-observations",
+    "href": "day_3_statistical_tests.html#three-or-more-observations",
+    "title": "Applying Tests of Significance",
+    "section": "Three or more observations",
+    "text": "Three or more observations\n\nWhen observations are repeated over time\nRepeated readings on same persons at different times\nDistribution of data\nRepeated Measures ANOVA\nFriednman’s test (Skewed data)"
+  },
+  {
+    "objectID": "day_3_statistical_tests.html#assumptions--repeated-measures",
+    "href": "day_3_statistical_tests.html#assumptions--repeated-measures",
+    "title": "Applying Tests of Significance",
+    "section": "Assumptions- Repeated measures",
+    "text": "Assumptions- Repeated measures\n\nNo significant outliers -box plot\nNormality: the outcome (or dependent) variable should be approximately normally distributed -Shapiro-Wilk normality test\nAssumption of sphericity: the variance of the differences between groups should be equal- Mauchly’s test of sphericity"
+  },
+  {
+    "objectID": "day_3_statistical_tests.html#example--repeated-measures",
+    "href": "day_3_statistical_tests.html#example--repeated-measures",
+    "title": "Applying Tests of Significance",
+    "section": "Example- Repeated measures",
+    "text": "Example- Repeated measures\n\nWe will use dataset from datarium package\nanxiety dataset will be used\nThe data provide the anxiety score, measured at three time points, of three groups of individuals practicing physical exercises at different levels (grp1: basal, grp2: moderate and grp3: high)\n\n\ndf_anxiety <- import(here(\"datasets\", \"anxiety\", \"df_anxiety.rds\"))\nhead(df_anxiety)\n\n# A tibble: 6 × 5\n  id    group    t1    t2    t3\n  <fct> <fct> <dbl> <dbl> <dbl>\n1 1     grp1   14.1  14.4  14.1\n2 2     grp1   14.5  14.6  14.3\n3 3     grp1   15.7  15.2  14.9\n4 4     grp1   16    15.5  15.3\n5 5     grp1   16.5  15.8  15.7\n6 6     grp1   16.9  16.5  16.2"
+  },
+  {
+    "objectID": "day_3_statistical_tests.html#example--repeated-measures-1",
+    "href": "day_3_statistical_tests.html#example--repeated-measures-1",
+    "title": "Applying Tests of Significance",
+    "section": "Example- Repeated measures",
+    "text": "Example- Repeated measures\n\nWe will use rstatix package which provides easy workflow\nWe have to convert data in long format\n\n\ndf_anxiety <- df_anxiety |> \n  pivot_longer(\n    cols = 3:5,\n    names_to = \"time\",\n    values_to = \"score\")\nhead(df_anxiety)\n\n# A tibble: 6 × 4\n  id    group time  score\n  <fct> <fct> <chr> <dbl>\n1 1     grp1  t1     14.1\n2 1     grp1  t2     14.4\n3 1     grp1  t3     14.1\n4 2     grp1  t1     14.5\n5 2     grp1  t2     14.6\n6 2     grp1  t3     14.3"
+  },
+  {
+    "objectID": "day_3_statistical_tests.html#check-distribution-and-outliers",
+    "href": "day_3_statistical_tests.html#check-distribution-and-outliers",
+    "title": "Applying Tests of Significance",
+    "section": "Check distribution and outliers",
+    "text": "Check distribution and outliers\n\ndf_anxiety |> ggplot(aes(y=score, x=time))+\n  geom_boxplot()\n\n\n\noutliers when present are indicated by points\nwe don’t see any outliers here"
+  },
+  {
+    "objectID": "day_3_statistical_tests.html#check-normality",
+    "href": "day_3_statistical_tests.html#check-normality",
+    "title": "Applying Tests of Significance",
+    "section": "Check normality",
+    "text": "Check normality\n\nlibrary(rstatix)\ndf_anxiety |> \n  group_by(time) |> \n  shapiro_test(score)\n\n# A tibble: 3 × 4\n  time  variable statistic     p\n  <chr> <chr>        <dbl> <dbl>\n1 t1    score        0.979 0.565\n2 t2    score        0.983 0.747\n3 t3    score        0.982 0.719\n\n\n\np-value non-significant, indicates approximate normal distribution"
+  },
+  {
+    "objectID": "day_3_statistical_tests.html#perform-repeated-measures-anova",
+    "href": "day_3_statistical_tests.html#perform-repeated-measures-anova",
+    "title": "Applying Tests of Significance",
+    "section": "Perform repeated measures ANOVA",
+    "text": "Perform repeated measures ANOVA\n\nanova_test() from rstatix package,\n  a wrapper around car::Anova() for making easy the computation of repeated measures ANOVA. \ndata: data frame\ndv: (numeric) the dependent (or outcome) variable name.\nwid: variable name specifying the case/sample identifier.\nwithin: within-subjects factor or grouping variable\nget_anova_table() [rstatix package]. Extracts the ANOVA table from the output of anova_test()"
+  },
+  {
+    "objectID": "day_3_statistical_tests.html#perform-repeated-measures-anova-1",
+    "href": "day_3_statistical_tests.html#perform-repeated-measures-anova-1",
+    "title": "Applying Tests of Significance",
+    "section": "Perform repeated measures ANOVA",
+    "text": "Perform repeated measures ANOVA\n\nlibrary(rstatix)\nresult <- anova_test(data = df_anxiety, dv = score, wid = id, within = time)\nget_anova_table(result)\n\nANOVA Table (type III tests)\n\n  Effect  DFn   DFd      F        p p<.05   ges\n1   time 1.15 50.55 66.226 1.66e-11     * 0.141\n\n\n\n\nusing base R\n\n\nresult <- aov(score~ time + Error(id/time), data = df_anxiety)\nsummary(result)\n\n\nError: id\n          Df Sum Sq Mean Sq F value Pr(>F)\nResiduals 44  361.1   8.208               \n\nError: id:time\n          Df Sum Sq Mean Sq F value Pr(>F)    \ntime       2  66.58   33.29   66.23 <2e-16 ***\nResiduals 88  44.23    0.50                   \n---\nSignif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1"
+  },
+  {
+    "objectID": "day_3_statistical_tests.html#graphs-and-stats-together-3",
+    "href": "day_3_statistical_tests.html#graphs-and-stats-together-3",
+    "title": "Applying Tests of Significance",
+    "section": "Graphs and stats together",
+    "text": "Graphs and stats together\n\nggstatsplot::ggwithinstats(data = df_anxiety, x= time, y= score)"
+  },
+  {
+    "objectID": "day_3_statistical_tests.html#compare-mean-with-some-reference",
+    "href": "day_3_statistical_tests.html#compare-mean-with-some-reference",
+    "title": "Applying Tests of Significance",
+    "section": "Compare mean with some reference",
+    "text": "Compare mean with some reference\n\nwe have estimated mean for one group, want to compare with that reported in literature\nOne-sample t-test can be used\nRecall Framingham dataset, mean SBP was 132.7737226\nWe would like to test if it is different from population mean of 125\n\n\nresult <- t.test(df_framingham$sbp, mu=125)\nresult\n\n\n    One Sample t-test\n\ndata:  df_framingham$sbp\nt = 23.274, df = 4657, p-value < 2.2e-16\nalternative hypothesis: true mean is not equal to 125\n95 percent confidence interval:\n 132.1189 133.4285\nsample estimates:\nmean of x \n 132.7737 \n\n\n\n\ninterpretation\n\n\nreport::report(result)\n\nEffect sizes were labelled following Cohen's (1988) recommendations.\n\nThe One Sample t-test testing the difference between df_framingham$sbp (mean =\n132.77) and mu = 125 suggests that the effect is positive, statistically\nsignificant, and small (difference = 7.77, 95% CI [132.12, 133.43], t(4657) =\n23.27, p < .001; Cohen's d = 0.34, 95% CI [0.31, 0.37])"
+  },
+  {
+    "objectID": "day_3_statistical_tests.html#compare-proportion-with-some-reference",
+    "href": "day_3_statistical_tests.html#compare-proportion-with-some-reference",
+    "title": "Applying Tests of Significance",
+    "section": "Compare proportion with some reference",
+    "text": "Compare proportion with some reference\n\nwe have estimated proportion for one group, want to compare with that reported in literature\nOne-proportion test can be used\nRecall Framingham dataset, out of 4658 observations with avaialble blood pressure 1760 (37.8%) had hypertension\nWe want to test if it is different from true population proportion of 25%\n\n\nresult <- prop.test(x=1760, n=4658, p=0.25)\nresult\n\n\n    1-sample proportions test with continuity correction\n\ndata:  1760 out of 4658, null probability 0.25\nX-squared = 405.35, df = 1, p-value < 2.2e-16\nalternative hypothesis: true p is not equal to 0.25\n95 percent confidence interval:\n 0.3639204 0.3919716\nsample estimates:\n        p \n0.3778446"
+  },
+  {
+    "objectID": "day_3_statistical_tests.html#compare-proportion-with-some-reference-1",
+    "href": "day_3_statistical_tests.html#compare-proportion-with-some-reference-1",
+    "title": "Applying Tests of Significance",
+    "section": "Compare proportion with some reference",
+    "text": "Compare proportion with some reference\n\nsometimes our sample size is small and we can’t use prop.test owing to assumptions\nsuch data often follow binomial distribution and we have to use binom.test\nsuppose 13 out of 24 patients had responded to a novel therapy, are the results different from 30% cure rate reported with standard therapy\n\n\n# exact binomial test\nresult <- binom.test(\n  x = 13, # counts of successes\n  n = 24, # total sample size \n  p = 0.3 # expected proportion\n)\n\nresult\n\n\n    Exact binomial test\n\ndata:  13 and 24\nnumber of successes = 13, number of trials = 24, p-value = 0.01366\nalternative hypothesis: true probability of success is not equal to 0.3\n95 percent confidence interval:\n 0.3282081 0.7444698\nsample estimates:\nprobability of success \n             0.5416667"
+  },
+  {
+    "objectID": "exercises.html",
+    "href": "exercises.html",
+    "title": "Practical Exercises",
+    "section": "",
+    "text": "Day\nExercise title\nExercise File/Link\nSolution\n\n\n\n\nDay-1\nHands-on Basics of R\nInteractive exercises\nswirl interactive exercises\nRStudio primers\nWithin exercises only\n\n\nDay-1\nImporting datasets\nEx- Import practice\nSol- Import practice"
+  },
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "R Workshop",
+    "section": "",
+    "text": "First workshop is scheduled on 11-14 Oct 2022."
+  },
+  {
+    "objectID": "presentations.html",
+    "href": "presentations.html",
+    "title": "Presentations / Slides",
+    "section": "",
+    "text": "Day\nSession\nLink to presentation\n\n\n\n\nDay-1\nIntroduction to workshop\nSlides\n\n\nDay-3\nApplying statistical tests\nSlides"
+  },
+  {
+    "objectID": "presentations/day_1/day1_intro.html#its-open-source-free",
+    "href": "presentations/day_1/day1_intro.html#its-open-source-free",
+    "title": ".",
+    "section": "It’s open source = Free",
+    "text": "It’s open source = Free\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nIt’s cross platform\nWorks with all operating systems"
+  },
+  {
+    "objectID": "presentations/day_1/day1_intro.html#popular-in-academia-trending",
+    "href": "presentations/day_1/day1_intro.html#popular-in-academia-trending",
+    "title": ".",
+    "section": "Popular in academia ~ Trending",
+    "text": "Popular in academia ~ Trending\n\nProgramming language but\n\nnatural language alike\nfunctions- named, verbs\neasy to guess and remember\n\nNon-computer science people can learn\nDocumentation is vast"
+  },
+  {
+    "objectID": "presentations/day_1/day1_intro.html#reproducible-research-workflow",
+    "href": "presentations/day_1/day1_intro.html#reproducible-research-workflow",
+    "title": ".",
+    "section": "Reproducible research workflow",
+    "text": "Reproducible research workflow\n\nData wrangling\nAnalysis scripts\nReport generation- publication ready tables and graphs\nCode sharing\nVersion control\nReproducible by anyone"
+  },
+  {
+    "objectID": "presentations/day_1/day1_intro.html#elegant-visualizations-or-graphs",
+    "href": "presentations/day_1/day1_intro.html#elegant-visualizations-or-graphs",
+    "title": ".",
+    "section": "Elegant visualizations or graphs",
+    "text": "Elegant visualizations or graphs"
+  },
+  {
+    "objectID": "presentations/day_1/day1_intro.html#elegant-visualizations-or-graphs-1",
+    "href": "presentations/day_1/day1_intro.html#elegant-visualizations-or-graphs-1",
+    "title": ".",
+    "section": "Elegant visualizations or graphs",
+    "text": "Elegant visualizations or graphs"
+  },
+  {
+    "objectID": "presentations/day_1/day1_intro.html#elegant-visualizations-or-graphs-2",
+    "href": "presentations/day_1/day1_intro.html#elegant-visualizations-or-graphs-2",
+    "title": ".",
+    "section": "Elegant visualizations or graphs",
+    "text": "Elegant visualizations or graphs"
+  },
+  {
+    "objectID": "presentations/day_1/day1_intro.html#rich-library-packages",
+    "href": "presentations/day_1/day1_intro.html#rich-library-packages",
+    "title": ".",
+    "section": "Rich library / packages",
+    "text": "Rich library / packages\n\nCRAN ~ Comprehensive R Archive Network\nCurrently 18693 packages\nRange of topics\n\nbasic epidemiology to causal inference\npharmacokinetics to genomics\ndescriptive analysis to multi-variable\nreporting templates etc"
+  },
+  {
+    "objectID": "presentations/day_1/day1_intro.html#non-statistical-uses",
+    "href": "presentations/day_1/day1_intro.html#non-statistical-uses",
+    "title": ".",
+    "section": "Non-statistical uses",
+    "text": "Non-statistical uses\n\nSince R is a programming language\nDevelop websites\nWeb Apps\nDashboards\nReport and presentation\nProgramming"
+  },
+  {
+    "objectID": "presentations/day_1/day1_intro.html#r-community",
+    "href": "presentations/day_1/day1_intro.html#r-community",
+    "title": ".",
+    "section": "R Community",
+    "text": "R Community\n\n-   https://blog.revolutionanalytics.com/2017/06/r-community.html"
+  },
+  {
+    "objectID": "presentations/day_1/day1_intro.html#by-the-end-of-workshop",
+    "href": "presentations/day_1/day1_intro.html#by-the-end-of-workshop",
+    "title": ".",
+    "section": "By the end of workshop",
+    "text": "By the end of workshop\n\nUse R and RStudio independently for\nData cleaning, creating variables\n\nDescribing data\nDescriptive statistics tables\n\nExploratory plots showing distributions\nApply appropriate statistical tests\nCreate publication ready tables\nCreate elegant, customized data visualizations\nKnow ways to seek help and troubleshoot problems in R"
+  },
+  {
+    "objectID": "presentations/day_3/d3.html#selection-of-test",
+    "href": "presentations/day_3/d3.html#selection-of-test",
+    "title": "Applying Tests of Significance",
+    "section": "Selection of test",
+    "text": "Selection of test"
+  },
+  {
+    "objectID": "presentations/day_3/d3.html#example-1",
+    "href": "presentations/day_3/d3.html#example-1",
+    "title": "Applying Tests of Significance",
+    "section": "Example-1",
+    "text": "Example-1\n\nLet us explore dataset from Framingham study\nIs there a difference in SBP among men and women?\n\n\n\nlibrary(here)\nlibrary(rio)\nlibrary(tidyverse)\ndf_framingham <- import(here(\"datasets\", \"framingham\", \"Framingham.Rdata\"))\nnames(df_framingham)\n\n\n [1] \"id\"       \"sex\"      \"sbp\"      \"dbp\"      \"scl\"      \"age\"     \n [7] \"bmi\"      \"month\"    \"followup\" \"chdfate\""
+  },
+  {
+    "objectID": "presentations/day_3/d3.html#check-distributions-histogram",
+    "href": "presentations/day_3/d3.html#check-distributions-histogram",
+    "title": "Applying Tests of Significance",
+    "section": "Check distributions (histogram)",
+    "text": "Check distributions (histogram)\n\n\nsbp_distribution <- ggplot(df_framingham, aes(x=sbp))+\n  geom_histogram(aes(y = ..density..))+\n  geom_density(colour=\"red\")\nsbp_distribution"
+  },
+  {
+    "objectID": "presentations/day_3/d3.html#check-distributions-q-q-plot",
+    "href": "presentations/day_3/d3.html#check-distributions-q-q-plot",
+    "title": "Applying Tests of Significance",
+    "section": "Check distributions (Q-Q plot)",
+    "text": "Check distributions (Q-Q plot)\n\nQ-Q plot by using qqnorm function\n\n\n\nqqnorm(df_framingham$sbp)"
+  },
+  {
+    "objectID": "presentations/day_3/d3.html#check-distributions",
+    "href": "presentations/day_3/d3.html#check-distributions",
+    "title": "Applying Tests of Significance",
+    "section": "Check distributions",
+    "text": "Check distributions\n\nLet us check distribution across gender\n\n\n\nsbp_distribution <- ggplot(df_framingham, aes(x=sbp))+\n  geom_histogram(aes(fill=factor(sex)), alpha=0.3) \nsbp_distribution"
+  },
+  {
+    "objectID": "presentations/day_3/d3.html#test-for-normality",
+    "href": "presentations/day_3/d3.html#test-for-normality",
+    "title": "Applying Tests of Significance",
+    "section": "Test for normality",
+    "text": "Test for normality\n\nthis is done by using Shapiro-Wilk Normality Test available through shapiro.test function of base R\n\n\n\nshapiro.test(df_framingham$sbp)\n\n\n\n    Shapiro-Wilk normality test\n\ndata:  df_framingham$sbp\nW = 0.92458, p-value < 2.2e-16"
+  },
+  {
+    "objectID": "presentations/day_3/d3.html#wilcoxan-rank-sum-test",
+    "href": "presentations/day_3/d3.html#wilcoxan-rank-sum-test",
+    "title": "Applying Tests of Significance",
+    "section": "Wilcoxan rank-sum test",
+    "text": "Wilcoxan rank-sum test\n\nbase R provides functions for many statistical tests\nwe will compute Wilcoxan rank-sum test by using wilcox.test function of base R\n\n\nwilcox.test(sbp ~ sex, data = df_framingham)\n\n\n    Wilcoxon rank sum test with continuity correction\n\ndata:  sbp by sex\nW = 2766638, p-value = 0.2619\nalternative hypothesis: true location shift is not equal to 0"
+  },
+  {
+    "objectID": "presentations/day_3/d3.html#t-test",
+    "href": "presentations/day_3/d3.html#t-test",
+    "title": "Applying Tests of Significance",
+    "section": "t-test",
+    "text": "t-test\n\nfor comparing two means we can use t.test function\n\n\nt.test(sbp ~ sex, data = df_framingham)\n\n\n    Welch Two Sample t-test\n\ndata:  sbp by sex\nt = -1.7669, df = 4694.3, p-value = 0.07731\nalternative hypothesis: true difference in means between group 1 and group 2 is not equal to 0\n95 percent confidence interval:\n -2.4274342  0.1260671\nsample estimates:\nmean in group 1 mean in group 2 \n       132.1176        133.2683"
+  },
+  {
+    "objectID": "presentations/day_3/d3.html#compare-two-groups--using-gtsummary",
+    "href": "presentations/day_3/d3.html#compare-two-groups--using-gtsummary",
+    "title": "Applying Tests of Significance",
+    "section": "Compare two groups- using gtsummary",
+    "text": "Compare two groups- using gtsummary\n\nwe need to compare many numerical variables\ne.g. dbp, cholesterol in this case\nand present it in tidy format\ngtsummary package\nadd_p() function"
+  },
+  {
+    "objectID": "presentations/day_3/d3.html#compare-two-groups--using-gtsummary-1",
+    "href": "presentations/day_3/d3.html#compare-two-groups--using-gtsummary-1",
+    "title": "Applying Tests of Significance",
+    "section": "Compare two groups- using gtsummary",
+    "text": "Compare two groups- using gtsummary\n\n\nlibrary(gtsummary)\ndf_framingham |> \n  select(-id,\n         -followup) |> \n  tbl_summary(by=sex) \n\n\n\n\n\n\n  \n  \n    \n      Characteristic\n      1, N = 2,0491\n      2, N = 2,6501\n    \n  \n  \n    sbp\n130 (120, 142)\n128 (115, 146)\n    dbp\n82 (75, 90)\n80 (72, 89)\n    scl\n225 (200, 250)\n225 (196, 258)\n        Unknown\n7\n26\n    age\n45 (38, 53)\n45 (39, 53)\n    bmi\n25.8 (23.6, 28.1)\n24.5 (22.3, 27.9)\n        Unknown\n2\n7\n    month\n6 (3, 10)\n6 (3, 10)\n    chdfate\n823 (40%)\n650 (25%)\n  \n  \n  \n    \n      1 Median (IQR); n (%)"
+  },
+  {
+    "objectID": "presentations/day_3/d3.html#compare-two-groups--using-gtsummary-2",
+    "href": "presentations/day_3/d3.html#compare-two-groups--using-gtsummary-2",
+    "title": "Applying Tests of Significance",
+    "section": "Compare two groups- using gtsummary",
+    "text": "Compare two groups- using gtsummary\n\n\nlibrary(gtsummary)\ndf_framingham |> \n  select(-id,\n         -followup) |> \n  tbl_summary(by=sex) |> \n  add_p()\n\n\n\n\n\n\n  \n  \n    \n      Characteristic\n      1, N = 2,0491\n      2, N = 2,6501\n      p-value2\n    \n  \n  \n    sbp\n130 (120, 142)\n128 (115, 146)\n0.3\n    dbp\n82 (75, 90)\n80 (72, 89)\n<0.001\n    scl\n225 (200, 250)\n225 (196, 258)\n0.6\n        Unknown\n7\n26\n\n    age\n45 (38, 53)\n45 (39, 53)\n0.091\n    bmi\n25.8 (23.6, 28.1)\n24.5 (22.3, 27.9)\n<0.001\n        Unknown\n2\n7\n\n    month\n6 (3, 10)\n6 (3, 10)\n0.9\n    chdfate\n823 (40%)\n650 (25%)\n<0.001\n  \n  \n  \n    \n      1 Median (IQR); n (%)\n    \n    \n      2 Wilcoxon rank sum test; Pearson's Chi-squared test"
+  },
+  {
+    "objectID": "presentations/day_3/d3.html#compare-two-groups--change-test",
+    "href": "presentations/day_3/d3.html#compare-two-groups--change-test",
+    "title": "Applying Tests of Significance",
+    "section": "Compare two groups- change test",
+    "text": "Compare two groups- change test\n\n\nlibrary(gtsummary)\ndf_framingham |> \n  select(-id,\n         -followup) |> \n  tbl_summary(by=sex,\n              statistic = list(all_continuous()~ \"{mean} ({sd})\")) |> \n  add_p(list(all_continuous() ~ \"t.test\")) \n\n\n\n\n\n\n  \n  \n    \n      Characteristic\n      1, N = 2,0491\n      2, N = 2,6501\n      p-value2\n    \n  \n  \n    sbp\n132 (20)\n133 (25)\n0.077\n    dbp\n83 (12)\n82 (13)\n<0.001\n    scl\n227 (42)\n229 (46)\n0.12\n        Unknown\n7\n26\n\n    age\n46 (8)\n46 (9)\n0.082\n    bmi\n26.0 (3.4)\n25.4 (4.6)\n<0.001\n        Unknown\n2\n7\n\n    month\n6 (4)\n6 (4)\n0.8\n    chdfate\n823 (40%)\n650 (25%)\n<0.001\n  \n  \n  \n    \n      1 Mean (SD); n (%)\n    \n    \n      2 Welch Two Sample t-test; Pearson's Chi-squared test\n    \n  \n\n\n\n\n\n\nlet us change type of statistical test\nit is done by assigning tests in add_p function"
+  },
+  {
+    "objectID": "presentations/day_3/d3.html#difference-in-two-types-of-tests",
+    "href": "presentations/day_3/d3.html#difference-in-two-types-of-tests",
+    "title": "Applying Tests of Significance",
+    "section": "Difference in two types of tests",
+    "text": "Difference in two types of tests\n\n\n\n\n\n\n  \n  \n    \n      Characteristic\n      \n        t-test\n      \n      \n        Wilcoxan rank-sum test\n      \n    \n    \n      1, N = 2,0491\n      2, N = 2,6501\n      p-value2\n      1, N = 2,0493\n      2, N = 2,6503\n      p-value4\n    \n  \n  \n    sbp\n132 (20)\n133 (25)\n0.077\n130 (120, 142)\n128 (115, 146)\n0.262\n    dbp\n83 (12)\n82 (13)\n<0.001\n82 (75, 90)\n80 (72, 89)\n<0.001\n    scl\n227 (42)\n229 (46)\n0.125\n225 (200, 250)\n225 (196, 258)\n0.601\n        Unknown\n7\n26\n\n7\n26\n\n    age\n46 (8)\n46 (9)\n0.082\n45 (38, 53)\n45 (39, 53)\n0.091\n    bmi\n26.0 (3.4)\n25.4 (4.6)\n<0.001\n25.8 (23.6, 28.1)\n24.5 (22.3, 27.9)\n<0.001\n        Unknown\n2\n7\n\n2\n7\n\n    month\n6 (4)\n6 (4)\n0.778\n6 (3, 10)\n6 (3, 10)\n0.890\n    chdfate\n823 (40%)\n650 (25%)\n<0.001\n823 (40%)\n650 (25%)\n<0.001\n  \n  \n  \n    \n      1 Mean (SD); n (%)\n    \n    \n      2 Welch Two Sample t-test; Pearson's Chi-squared test\n    \n    \n      3 Median (IQR); n (%)\n    \n    \n      4 Wilcoxon rank sum test; Pearson's Chi-squared test"
+  },
+  {
+    "objectID": "presentations/day_3/d3.html#compare-groups--graphs-tests-together-ggstatplot",
+    "href": "presentations/day_3/d3.html#compare-groups--graphs-tests-together-ggstatplot",
+    "title": "Applying Tests of Significance",
+    "section": "Compare groups- graphs & tests together ggstatplot",
+    "text": "Compare groups- graphs & tests together ggstatplot\n\nlibrary(ggstatsplot)\ndf_framingham |> \n  ggbetweenstats(x=sex,\n                 y=sbp)"
+  },
+  {
+    "objectID": "presentations/day_3/d3.html#graphs-tests-together-ggstatplot",
+    "href": "presentations/day_3/d3.html#graphs-tests-together-ggstatplot",
+    "title": "Applying Tests of Significance",
+    "section": "Graphs & tests together ggstatplot",
+    "text": "Graphs & tests together ggstatplot\n\n\nCode\nlibrary(ggstatsplot)\ndf_framingham |> \n  ggbetweenstats(x=sex,\n                 y=sbp,\n                 plot.type = \"box\",\n                 type = \"nonparametric\",\n                 point.args = list(position = ggplot2::position_jitterdodge(dodge.width = 0.6), alpha =\n    0.1, size = 0.5, stroke = 0))"
+  },
+  {
+    "objectID": "presentations/day_3/d3.html#selection-of-test-1",
+    "href": "presentations/day_3/d3.html#selection-of-test-1",
+    "title": "Applying Tests of Significance",
+    "section": "Selection of test",
+    "text": "Selection of test\n\ndistribution of data\nequality of variances\nParametric or non-skewed\n  One-Way Analysis of Variance (ANOVA)\n  Felch-ANOVA (Unequal variances)\nKruskal-Wallis Test"
+  },
+  {
+    "objectID": "presentations/day_3/d3.html#example-2",
+    "href": "presentations/day_3/d3.html#example-2",
+    "title": "Applying Tests of Significance",
+    "section": "Example-2",
+    "text": "Example-2\nLet us create varaible with 3 categories from variable bmi\n\ndf_framingham <- df_framingham |> \n  mutate(bmi_cat = case_when(\n    bmi <= 25 ~ \"<=25\",\n    (bmi>25 & bmi<=30) ~ \"Overweight\",\n    bmi >30 ~ \"Obese\"\n  )) |> \n  mutate(bmi_cat = factor(bmi_cat,\n                          levels = c(\"<=25\",\n                                     \"Overweight\",\n                                     \"Obese\"))) |> \n  drop_na()"
+  },
+  {
+    "objectID": "presentations/day_3/d3.html#check-distributions-density-curves",
+    "href": "presentations/day_3/d3.html#check-distributions-density-curves",
+    "title": "Applying Tests of Significance",
+    "section": "Check distributions (Density curves)",
+    "text": "Check distributions (Density curves)\n\nggplot(data = df_framingham, aes(x=sbp))+\n  geom_density(aes(fill=bmi_cat), alpha=0.3)"
+  },
+  {
+    "objectID": "presentations/day_3/d3.html#check-distributions-box-plots",
+    "href": "presentations/day_3/d3.html#check-distributions-box-plots",
+    "title": "Applying Tests of Significance",
+    "section": "Check distributions (Box-plots)",
+    "text": "Check distributions (Box-plots)\n\nggplot(data = df_framingham, aes(y=sbp, x=bmi_cat))+\n  geom_boxplot(aes(fill=bmi_cat), alpha=0.3)+\n  theme_ggstatsplot()"
+  },
+  {
+    "objectID": "presentations/day_3/d3.html#check-distributions-shapiro-wilk-test",
+    "href": "presentations/day_3/d3.html#check-distributions-shapiro-wilk-test",
+    "title": "Applying Tests of Significance",
+    "section": "Check distributions (Shapiro-Wilk Test)",
+    "text": "Check distributions (Shapiro-Wilk Test)\n\nnormality_test <- df_framingham |> split(~bmi_cat) %>%\n  map(~ shapiro.test(.x$sbp))\nnormality_test\n\n$`<=25`\n\n    Shapiro-Wilk normality test\n\ndata:  .x$sbp\nW = 0.90567, p-value < 2.2e-16\n\n\n$Overweight\n\n    Shapiro-Wilk normality test\n\ndata:  .x$sbp\nW = 0.92473, p-value < 2.2e-16\n\n\n$Obese\n\n    Shapiro-Wilk normality test\n\ndata:  .x$sbp\nW = 0.94307, p-value = 4.645e-14"
+  },
+  {
+    "objectID": "presentations/day_3/d3.html#kruskal-wallis-test",
+    "href": "presentations/day_3/d3.html#kruskal-wallis-test",
+    "title": "Applying Tests of Significance",
+    "section": "Kruskal-Wallis test",
+    "text": "Kruskal-Wallis test\n\nkruskal.test(sbp ~ bmi_cat, data = df_framingham)\n\n\n    Kruskal-Wallis rank sum test\n\ndata:  sbp by bmi_cat\nKruskal-Wallis chi-squared = 465.5, df = 2, p-value < 2.2e-16"
+  },
+  {
+    "objectID": "presentations/day_3/d3.html#pair-wise-comparisons",
+    "href": "presentations/day_3/d3.html#pair-wise-comparisons",
+    "title": "Applying Tests of Significance",
+    "section": "Pair-wise comparisons",
+    "text": "Pair-wise comparisons\n\npost-hoc tests\nwhen initial test indicates difference in distribution\nmany tests\nDunn’s test for non-parametric"
+  },
+  {
+    "objectID": "presentations/day_3/d3.html#pair-wise-comparisons-1",
+    "href": "presentations/day_3/d3.html#pair-wise-comparisons-1",
+    "title": "Applying Tests of Significance",
+    "section": "Pair-wise comparisons",
+    "text": "Pair-wise comparisons\n\nlibrary(PMCMRplus)\nkwAllPairsDunnTest(sbp ~ bmi_cat, data = df_framingham)\n\n           <=25   Overweight\nOverweight <2e-16 -         \nObese      <2e-16 <2e-16    \n\n\n\n\nsummary(kwAllPairsDunnTest(sbp ~ bmi_cat, data = df_framingham))\n\n                        z value   Pr(>|z|)    \nOverweight - <=25 == 0   15.136 < 2.22e-16 ***\nObese - <=25 == 0        19.217 < 2.22e-16 ***\nObese - Overweight == 0   8.790 < 2.22e-16 ***"
+  },
+  {
+    "objectID": "presentations/day_3/d3.html#one-way-anova",
+    "href": "presentations/day_3/d3.html#one-way-anova",
+    "title": "Applying Tests of Significance",
+    "section": "One way ANOVA",
+    "text": "One way ANOVA\n\naov(sbp ~ bmi_cat, data = df_framingham)\n\nCall:\n   aov(formula = sbp ~ bmi_cat, data = df_framingham)\n\nTerms:\n                  bmi_cat Residuals\nSum of Squares   208072.2 2211993.3\nDeg. of Freedom         2      4655\n\nResidual standard error: 21.79877\nEstimated effects may be unbalanced\n\n\n\n\nsummary.aov(aov(sbp ~ bmi_cat, data = df_framingham))\n\n              Df  Sum Sq Mean Sq F value Pr(>F)    \nbmi_cat        2  208072  104036   218.9 <2e-16 ***\nResiduals   4655 2211993     475                   \n---\nSignif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1"
+  },
+  {
+    "objectID": "presentations/day_3/d3.html#pair-wise-comparison-after-anova",
+    "href": "presentations/day_3/d3.html#pair-wise-comparison-after-anova",
+    "title": "Applying Tests of Significance",
+    "section": "Pair-wise comparison after ANOVA",
+    "text": "Pair-wise comparison after ANOVA\n\npair wise t tests with Bonferroni correction\n\n\nwith (df_framingham, pairwise.t.test(sbp, bmi_cat,  p.adjust.method = \"bonf\"))\n\n\n    Pairwise comparisons using t tests with pooled SD \n\ndata:  sbp and bmi_cat \n\n           <=25   Overweight\nOverweight <2e-16 -         \nObese      <2e-16 <2e-16    \n\nP value adjustment method: bonferroni"
+  },
+  {
+    "objectID": "presentations/day_3/d3.html#graphs-and-stats-together",
+    "href": "presentations/day_3/d3.html#graphs-and-stats-together",
+    "title": "Applying Tests of Significance",
+    "section": "Graphs and stats together",
+    "text": "Graphs and stats together\n\n\nCode\nggstatsplot::ggbetweenstats(data = df_framingham,\n                        x=bmi_cat,\n                        y=sbp,\n                        plot.type = \"box\",\n                 type = \"nonparametric\",\n                 point.args = list(position = ggplot2::position_jitterdodge(dodge.width = 0.6), alpha =\n    0.1, size = 0.5, stroke = 0))"
+  },
+  {
+    "objectID": "presentations/day_3/d3.html#graphs-and-stats-together-parametric",
+    "href": "presentations/day_3/d3.html#graphs-and-stats-together-parametric",
+    "title": "Applying Tests of Significance",
+    "section": "Graphs and stats together (Parametric)",
+    "text": "Graphs and stats together (Parametric)\n\n\nCode\nggstatsplot::ggbetweenstats(data = df_framingham,\n                        x=bmi_cat,\n                        y=sbp,\n                        plot.type = \"box\",\n                 type = \"parametric\",\n                 point.args = list(position = ggplot2::position_jitterdodge(dodge.width = 0.6), alpha =\n    0.1, size = 0.5, stroke = 0))"
+  },
+  {
+    "objectID": "presentations/day_3/d3.html#using-gtsummary",
+    "href": "presentations/day_3/d3.html#using-gtsummary",
+    "title": "Applying Tests of Significance",
+    "section": "Using gtsummary",
+    "text": "Using gtsummary\n\n\nCode\ndf_framingham |> gtsummary::tbl_summary(\n  by = bmi_cat,\n  include = (c( sbp, dbp, scl)),\n  digits = list(all_continuous()~c(1,1))\n) |> \n  add_p()\n\n\n\n\n\n\n  \n  \n    \n      Characteristic\n      <=25, N = 2,2621\n      Overweight, N = 1,8201\n      Obese, N = 5761\n      p-value2\n    \n  \n  \n    sbp\n124.0 (112.0, 136.0)\n132.0 (120.0, 146.0)\n142.0 (130.0, 160.0)\n<0.001\n    dbp\n78.0 (70.0, 84.0)\n84.0 (78.0, 92.0)\n90.0 (82.0, 98.0)\n<0.001\n    scl\n217.0 (192.0, 246.0)\n230.0 (202.0, 260.0)\n234.0 (209.0, 262.2)\n<0.001\n  \n  \n  \n    \n      1 Median (IQR)\n    \n    \n      2 Kruskal-Wallis rank sum test"
+  },
+  {
+    "objectID": "presentations/day_3/d3.html#using-gtsummary-compare-against-reference",
+    "href": "presentations/day_3/d3.html#using-gtsummary-compare-against-reference",
+    "title": "Applying Tests of Significance",
+    "section": "Using gtsummary (Compare against reference)",
+    "text": "Using gtsummary (Compare against reference)\n\n\nCode\n# table summarizing data\nt0 <- df_framingham |> gtsummary::tbl_summary(\n  by = bmi_cat,\n  include = (c( sbp, dbp, scl)),\n  digits = list(all_continuous()~c(1,1))) \n\n# table comparing <=25 with Overweight\nt1 <- df_framingham |> \n  filter(bmi_cat %in% c(\"<=25\", \"Overweight\")) |> \n  tbl_summary(by = bmi_cat, missing = \"no\",\n              include = (c( sbp, dbp, scl))) |> \n  add_p() |> \n  modify_header(p.value ~ (\"**<=25 vs. Overweight**\")) |> \n  # hide summary stat columns\n  modify_column_hide(all_stat_cols())\n\n# table comparing <=25 with Obese\nt2 <- df_framingham |> \n  filter(bmi_cat %in% c(\"<=25\", \"Obese\")) |> \n  tbl_summary(by = bmi_cat, missing = \"no\",\n              include = (c( sbp, dbp, scl))) |> \n  add_p() |> \n  modify_header(p.value ~ (\"**<=25 vs. Obese**\")) |> \n  # hide summary stat columns\n  modify_column_hide(all_stat_cols())\n\n# merging the 3 tables together, and adding additional gt formatting\ntbl_merge(list(t0, t1, t2)) %>%\n  modify_spanning_header(\n    list(\n      all_stat_cols() ~ \"**BMI Groups**\",\n      starts_with(\"p.value\") ~ \"**p-values**\"\n    )\n  )\n\n\n\n\n\n\n  \n  \n    \n      Characteristic\n      \n        BMI Groups\n      \n      \n        p-values\n      \n    \n    \n      <=25, N = 2,2621\n      Overweight, N = 1,8201\n      Obese, N = 5761\n      <=25 vs. Overweight2\n      <=25 vs. Obese2\n    \n  \n  \n    sbp\n124.0 (112.0, 136.0)\n132.0 (120.0, 146.0)\n142.0 (130.0, 160.0)\n<0.001\n<0.001\n    dbp\n78.0 (70.0, 84.0)\n84.0 (78.0, 92.0)\n90.0 (82.0, 98.0)\n<0.001\n<0.001\n    scl\n217.0 (192.0, 246.0)\n230.0 (202.0, 260.0)\n234.0 (209.0, 262.2)\n<0.001\n<0.001\n  \n  \n  \n    \n      1 Median (IQR)\n    \n    \n      2 Wilcoxon rank sum test"
+  },
+  {
+    "objectID": "presentations/day_3/d3.html#categorical-or-nominal-variables",
+    "href": "presentations/day_3/d3.html#categorical-or-nominal-variables",
+    "title": "Applying Tests of Significance",
+    "section": "Categorical or nominal variables",
+    "text": "Categorical or nominal variables\n\nNominal or categorical variables - summarized as proportion\nMany clinical outcomes are presented as binary or categorical variable for ease of interpretation\nBlood pressure readings are converted to categorical- Presence or absence of hypertension\nOur interest lies in knowing if one group has more proportion of an outcome than other group"
+  },
+  {
+    "objectID": "presentations/day_3/d3.html#selection-of-test-2",
+    "href": "presentations/day_3/d3.html#selection-of-test-2",
+    "title": "Applying Tests of Significance",
+    "section": "Selection of test",
+    "text": "Selection of test\n\nTwo independent groups\n  Chi-square test\n  Difference in two proportions\n  Fisher's exact test (expected freq <5)\nPaired or non-independent observations\n  binary or two categories- McNemar test\n  >2 categories- Cochran's Q"
+  },
+  {
+    "objectID": "presentations/day_3/d3.html#example--3",
+    "href": "presentations/day_3/d3.html#example--3",
+    "title": "Applying Tests of Significance",
+    "section": "Example- 3",
+    "text": "Example- 3\n\nLet’s create variable ‘bp_categories’ from sbp and dbp\n\n\ndf_framingham <-  df_framingham |> \n  mutate(bp_categories= case_when(\n    (sbp>=140 | dbp>=90) ~ \"hypertension\",\n    (sbp<140 & sbp>=120) |(dbp<90 & dbp>=80) ~ \"elevated BP\",\n    (sbp<120 & dbp<80) ~ \"normotensive\"\n  )) |> \n  mutate(bp_categories=factor(bp_categories,\n                              levels = c(\"normotensive\",\n                                         \"elevated BP\",\n                                         \"hypertension\"),\n                              labels = c(\"Normotensive\",\n                                         \"Elevated BP\",\n                                         \"Hypertension\")))"
+  },
+  {
+    "objectID": "presentations/day_3/d3.html#apply-chi-square-test",
+    "href": "presentations/day_3/d3.html#apply-chi-square-test",
+    "title": "Applying Tests of Significance",
+    "section": "Apply Chi-square test",
+    "text": "Apply Chi-square test\n\ntable(df_framingham$bmi_cat, df_framingham$bp_categories)\n\n            \n             Normotensive Elevated BP Hypertension\n  <=25                798         902          562\n  Overweight          289         713          818\n  Obese                36         160          380\n\n\n\n\nchisq.test(df_framingham$bmi_cat, df_framingham$bp_categories)\n\n\n    Pearson's Chi-squared test\n\ndata:  df_framingham$bmi_cat and df_framingham$bp_categories\nX-squared = 508.96, df = 4, p-value < 2.2e-16\n\n\n\n\n\nwith(df_framingham, chisq.test(bmi_cat, bp_categories))\n\n\n    Pearson's Chi-squared test\n\ndata:  bmi_cat and bp_categories\nX-squared = 508.96, df = 4, p-value < 2.2e-16"
+  },
+  {
+    "objectID": "presentations/day_3/d3.html#apply-chi-square-test-1",
+    "href": "presentations/day_3/d3.html#apply-chi-square-test-1",
+    "title": "Applying Tests of Significance",
+    "section": "Apply Chi-square test",
+    "text": "Apply Chi-square test\n\n\nlibrary(gtsummary)\ndf_framingham |> \n  tbl_summary(by=bp_categories,\n              include = c(sex, bmi_cat),\n              digits = list(all_categorical() ~ c(0,1)))\n\n\n\n\n\n\n  \n  \n    \n      Characteristic\n      Normotensive, N = 1,1231\n      Elevated BP, N = 1,7751\n      Hypertension, N = 1,7601\n    \n  \n  \n    sex\n\n\n\n        1\n403 (35.9%)\n834 (47.0%)\n803 (45.6%)\n        2\n720 (64.1%)\n941 (53.0%)\n957 (54.4%)\n    bmi_cat\n\n\n\n        <=25\n798 (71.1%)\n902 (50.8%)\n562 (31.9%)\n        Overweight\n289 (25.7%)\n713 (40.2%)\n818 (46.5%)\n        Obese\n36 (3.2%)\n160 (9.0%)\n380 (21.6%)\n  \n  \n  \n    \n      1 n (%)"
+  },
+  {
+    "objectID": "presentations/day_3/d3.html#apply-chi-square-test-2",
+    "href": "presentations/day_3/d3.html#apply-chi-square-test-2",
+    "title": "Applying Tests of Significance",
+    "section": "Apply Chi-square test",
+    "text": "Apply Chi-square test\n\n\nlibrary(gtsummary)\ndf_framingham |> \n  tbl_summary(by=bp_categories,\n              include = c(sex, bmi_cat),\n              digits = list(all_categorical() ~ c(0,1))) |> \n  add_p()\n\n\n\n\n\n\n  \n  \n    \n      Characteristic\n      Normotensive, N = 1,1231\n      Elevated BP, N = 1,7751\n      Hypertension, N = 1,7601\n      p-value2\n    \n  \n  \n    sex\n\n\n\n<0.001\n        1\n403 (35.9%)\n834 (47.0%)\n803 (45.6%)\n\n        2\n720 (64.1%)\n941 (53.0%)\n957 (54.4%)\n\n    bmi_cat\n\n\n\n<0.001\n        <=25\n798 (71.1%)\n902 (50.8%)\n562 (31.9%)\n\n        Overweight\n289 (25.7%)\n713 (40.2%)\n818 (46.5%)\n\n        Obese\n36 (3.2%)\n160 (9.0%)\n380 (21.6%)\n\n  \n  \n  \n    \n      1 n (%)\n    \n    \n      2 Pearson's Chi-squared test"
+  },
+  {
+    "objectID": "presentations/day_3/d3.html#apply-chi-square-test-3",
+    "href": "presentations/day_3/d3.html#apply-chi-square-test-3",
+    "title": "Applying Tests of Significance",
+    "section": "Apply Chi-square test",
+    "text": "Apply Chi-square test\n\n\nlibrary(gtsummary)\ndf_framingham |> \n  tbl_summary(by=bp_categories,\n              percent = \"row\",\n              include = c(sex, bmi_cat),\n              digits = list(all_categorical() ~ c(0,1))) |> \n  add_p() \n\n\n\n\n\n\n  \n  \n    \n      Characteristic\n      Normotensive, N = 1,1231\n      Elevated BP, N = 1,7751\n      Hypertension, N = 1,7601\n      p-value2\n    \n  \n  \n    sex\n\n\n\n<0.001\n        1\n403 (19.8%)\n834 (40.9%)\n803 (39.4%)\n\n        2\n720 (27.5%)\n941 (35.9%)\n957 (36.6%)\n\n    bmi_cat\n\n\n\n<0.001\n        <=25\n798 (35.3%)\n902 (39.9%)\n562 (24.8%)\n\n        Overweight\n289 (15.9%)\n713 (39.2%)\n818 (44.9%)\n\n        Obese\n36 (6.2%)\n160 (27.8%)\n380 (66.0%)\n\n  \n  \n  \n    \n      1 n (%)\n    \n    \n      2 Pearson's Chi-squared test\n    \n  \n\n\n\n\n\n\npercentages changed to row percent"
+  },
+  {
+    "objectID": "presentations/day_3/d3.html#apply-chi-square-test-4",
+    "href": "presentations/day_3/d3.html#apply-chi-square-test-4",
+    "title": "Applying Tests of Significance",
+    "section": "Apply Chi-square test",
+    "text": "Apply Chi-square test\n\n\nlibrary(gtsummary)\ndf_framingham |> \n  tbl_summary(by=bp_categories,\n              percent = \"row\",\n              statistic = list(all_categorical()~\"{n} ({p})\"),\n              include = c(sex, bmi_cat),\n              digits = list(all_categorical() ~ c(0,1))) |> \n  add_p() \n\n\n\n\n\n\n  \n  \n    \n      Characteristic\n      Normotensive, N = 1,1231\n      Elevated BP, N = 1,7751\n      Hypertension, N = 1,7601\n      p-value2\n    \n  \n  \n    sex\n\n\n\n<0.001\n        1\n403 (19.8)\n834 (40.9)\n803 (39.4)\n\n        2\n720 (27.5)\n941 (35.9)\n957 (36.6)\n\n    bmi_cat\n\n\n\n<0.001\n        <=25\n798 (35.3)\n902 (39.9)\n562 (24.8)\n\n        Overweight\n289 (15.9)\n713 (39.2)\n818 (44.9)\n\n        Obese\n36 (6.2)\n160 (27.8)\n380 (66.0)\n\n  \n  \n  \n    \n      1 n (%)\n    \n    \n      2 Pearson's Chi-squared test\n    \n  \n\n\n\n\n\n\npercent sign removed"
+  },
+  {
+    "objectID": "presentations/day_3/d3.html#graphs-and-stats-together-1",
+    "href": "presentations/day_3/d3.html#graphs-and-stats-together-1",
+    "title": "Applying Tests of Significance",
+    "section": "Graphs and stats together",
+    "text": "Graphs and stats together\n\n\nCode\nlibrary(ggstatsplot)\ndf_framingham |> \n  ggbarstats(x = bp_categories,\n             y = bmi_cat,\n             proportion.test = FALSE,\n             xlab = \"\",\n             legend.title = \"BP Categories\",\n             title = \"Association of BMI and BP Status\",\n             bf.message = FALSE,\n             ggtheme = ggthemes::theme_fivethirtyeight())"
+  },
+  {
+    "objectID": "presentations/day_3/d3.html#graphs-and-stats-together-2",
+    "href": "presentations/day_3/d3.html#graphs-and-stats-together-2",
+    "title": "Applying Tests of Significance",
+    "section": "Graphs and stats together",
+    "text": "Graphs and stats together\n\n\nCode\nlibrary(ggstatsplot)\ndf_framingham |> \n  mutate(sex = factor(sex, labels = c(\"Males\", \"Females\"))) |> \n  ggbarstats(x = bp_categories,\n             y = sex,\n             proportion.test = FALSE,\n             xlab = \"\",\n             legend.title = \"BP Categories\",\n             title = \"Association of Sex and BP Status\",\n             bf.message = FALSE,\n             ggtheme = ggthemes::theme_wsj())"
+  },
+  {
+    "objectID": "presentations/day_3/d3.html#comparing-two-related-or-paired-nominal-variables",
+    "href": "presentations/day_3/d3.html#comparing-two-related-or-paired-nominal-variables",
+    "title": "Applying Tests of Significance",
+    "section": "Comparing two related or paired nominal variables",
+    "text": "Comparing two related or paired nominal variables\n\nCategorical observation on same subject 2 or more times\n  Result of certain test as Pos/Neg at two different times\n  Result of two different tests on same subject at same time\n  Diagnostic research - new test vs reference\nPaired or matched observation\n  matched pair case-control studies\nLet’s explore with example"
+  },
+  {
+    "objectID": "presentations/day_3/d3.html#comparing-two-paired-nominal-observations",
+    "href": "presentations/day_3/d3.html#comparing-two-paired-nominal-observations",
+    "title": "Applying Tests of Significance",
+    "section": "Comparing two paired nominal observations",
+    "text": "Comparing two paired nominal observations\n\nDataset contains Blood lead levels data from Pruzek & Helmreich\n\n\n\n\n\nmatched paired data corresponding to blood lead levels for 33 children of parents who had worked in a lead related factory and 33 control children from their neighborhood\nBlood lead levels more than 20 ug/dL are categorized as “High”\nLet’s import dataset and view its head\n\n\ndf_lead <- import(here(\"datasets\", \"lead\", \"df_lead.rds\"))\nhead(df_lead, n=4)\n\n  Pair Exposed Control Exposed_Cat Control_Cat\n1  P01      38      16        High         Low\n2  P02      23      18        High         Low\n3  P03      41      18        High         Low\n4  P04      18      24         Low        High"
+  },
+  {
+    "objectID": "presentations/day_3/d3.html#mcnemar-test",
+    "href": "presentations/day_3/d3.html#mcnemar-test",
+    "title": "Applying Tests of Significance",
+    "section": "McNemar Test",
+    "text": "McNemar Test\n\ntable(df_lead$Exposed_Cat, df_lead$Control_Cat)\n\n      \n       High Low\n  High    3  23\n  Low     2   5\n\n\n\nresult <- mcnemar.test(df_lead$Exposed_Cat, df_lead$Control_Cat)\nresult\n\n\n    McNemar's Chi-squared test with continuity correction\n\ndata:  df_lead$Exposed_Cat and df_lead$Control_Cat\nMcNemar's chi-squared = 16, df = 1, p-value = 6.334e-05"
+  },
+  {
+    "objectID": "presentations/day_3/d3.html#mcnemar-test-in-gtsummary",
+    "href": "presentations/day_3/d3.html#mcnemar-test-in-gtsummary",
+    "title": "Applying Tests of Significance",
+    "section": "McNemar Test in gtsummary",
+    "text": "McNemar Test in gtsummary\n\nlibrary(gtsummary)\ndf_lead |> \n  tbl_summary(by=Control_Cat,\n              include = c(Exposed_Cat)) |> \n  add_p(test=all_categorical()~\"mcnemar.test.wide\") |> \n  modify_spanning_header(all_stat_cols()~ \"**Control_Cat**\")\n\n\n\n\n\n  \n  \n    \n      Characteristic\n      \n        Control_Cat\n      \n      p-value2\n    \n    \n      High, N = 51\n      Low, N = 281\n    \n  \n  \n    Exposed_Cat\n\n\n<0.001\n        High\n3 (60%)\n23 (82%)\n\n        Low\n2 (40%)\n5 (18%)\n\n  \n  \n  \n    \n      1 n (%)\n    \n    \n      2 McNemar's Chi-squared test with continuity correction"
+  },
+  {
+    "objectID": "presentations/day_3/d3.html#two-observations-before-after-type",
+    "href": "presentations/day_3/d3.html#two-observations-before-after-type",
+    "title": "Applying Tests of Significance",
+    "section": "Two observations (before-after type)",
+    "text": "Two observations (before-after type)\n\nNormally distributed- paired t-test\nSkewed- Wilcoxan Signed Rank Test\nExample- Dataset contain weights before and after treatment of anorexia\n  Let's load the data and view structure\n\n\ndf_anorexia <- import(here(\"datasets\", \"anorexia\", \"df_anorexia.rds\"))\nstr(df_anorexia)\n\n'data.frame':   72 obs. of  3 variables:\n $ Treat : Factor w/ 3 levels \"CBT\",\"Cont\",\"FT\": 2 2 2 2 2 2 2 2 2 2 ...\n $ Prewt : num  80.7 89.4 91.8 74 78.1 88.3 87.3 75.1 80.6 78.4 ...\n $ Postwt: num  80.2 80.1 86.4 86.3 76.1 78.1 75.1 86.7 73.5 84.6 ..."
+  },
+  {
+    "objectID": "presentations/day_3/d3.html#check-distributions-1",
+    "href": "presentations/day_3/d3.html#check-distributions-1",
+    "title": "Applying Tests of Significance",
+    "section": "Check distributions",
+    "text": "Check distributions\n\nPlot histograms (quickly)\n\n\nhist(df_anorexia$Prewt,  xlab = \"Pre Weight\")\n\nsummary(df_anorexia$Prewt)\n\n   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. \n  70.00   79.60   82.30   82.41   86.00   94.90"
+  },
+  {
+    "objectID": "presentations/day_3/d3.html#check-distributions-2",
+    "href": "presentations/day_3/d3.html#check-distributions-2",
+    "title": "Applying Tests of Significance",
+    "section": "Check distributions",
+    "text": "Check distributions\n\nhist(df_anorexia$Postwt,  xlab = \"Post Weight\")\n\nsummary(df_anorexia$Postwt)\n\n   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. \n  71.30   79.33   84.05   85.17   91.55  103.60"
+  },
+  {
+    "objectID": "presentations/day_3/d3.html#check-normality---shapiro-wilk-test",
+    "href": "presentations/day_3/d3.html#check-normality---shapiro-wilk-test",
+    "title": "Applying Tests of Significance",
+    "section": "Check normality - Shapiro-Wilk Test",
+    "text": "Check normality - Shapiro-Wilk Test\n\nshapiro.test(df_anorexia$Prewt)\n\n\n    Shapiro-Wilk normality test\n\ndata:  df_anorexia$Prewt\nW = 0.99248, p-value = 0.9484\n\n\n\n\nshapiro.test(df_anorexia$Postwt)\n\n\n    Shapiro-Wilk normality test\n\ndata:  df_anorexia$Postwt\nW = 0.9673, p-value = 0.05781"
+  },
+  {
+    "objectID": "presentations/day_3/d3.html#wilcoxan-signed-rank-test",
+    "href": "presentations/day_3/d3.html#wilcoxan-signed-rank-test",
+    "title": "Applying Tests of Significance",
+    "section": "Wilcoxan signed-rank test",
+    "text": "Wilcoxan signed-rank test\n\nwith(df_anorexia, wilcox.test(Postwt, Prewt, \n                              paired=TRUE))\n\n\n    Wilcoxon signed rank test with continuity correction\n\ndata:  Postwt and Prewt\nV = 1724.5, p-value = 0.0106\nalternative hypothesis: true location shift is not equal to 0\n\n# save it as result\nresult <- wilcox.test(df_anorexia$Postwt, df_anorexia$Prewt,\n                              paired=TRUE)\n\n. . . - Let’s use report package to understand results\n\nlibrary(report)\nreport(result)\n\nEffect sizes were labelled following Funder's (2019) recommendations.\n\nThe Wilcoxon signed rank test with continuity correction testing the difference\nin ranks between df_anorexia$Postwt and df_anorexia$Prewt suggests that the\neffect is positive, statistically significant, and large (W = 1724.50, p =\n0.011; r (rank biserial) = 0.35, 95% CI [0.10, 0.56])"
+  },
+  {
+    "objectID": "presentations/day_3/d3.html#paired-t-test",
+    "href": "presentations/day_3/d3.html#paired-t-test",
+    "title": "Applying Tests of Significance",
+    "section": "Paired t-test",
+    "text": "Paired t-test\n\nresult <- with(df_anorexia, t.test(Prewt, Postwt, paired=TRUE))\nresult\n\n\n    Paired t-test\n\ndata:  Prewt and Postwt\nt = -2.9376, df = 71, p-value = 0.004458\nalternative hypothesis: true mean difference is not equal to 0\n95 percent confidence interval:\n -4.6399424 -0.8878354\nsample estimates:\nmean difference \n      -2.763889 \n\n\n. . . - Let’s use report package to understand results\n\nlibrary(report)\nreport(result)\n\nEffect sizes were labelled following Cohen's (1988) recommendations.\n\nThe Paired t-test testing the difference between Prewt and Postwt (mean\ndifference = -2.76) suggests that the effect is negative, statistically\nsignificant, and small (difference = -2.76, 95% CI [-4.64, -0.89], t(71) =\n-2.94, p = 0.004; Cohen's d = -0.35, 95% CI [-0.59, -0.11])"
+  },
+  {
+    "objectID": "presentations/day_3/d3.html#paired-test-using-gtsummary",
+    "href": "presentations/day_3/d3.html#paired-test-using-gtsummary",
+    "title": "Applying Tests of Significance",
+    "section": "Paired test using gtsummary",
+    "text": "Paired test using gtsummary\n\nneeds data in long format\neach individual will have two readings . . .\n\n\nlibrary(tidyverse)\n# Convert row number to id\ndf_anorexia <- df_anorexia |> \n  rownames_to_column(var = \"id\") \nnames(df_anorexia)  \n\n[1] \"id\"     \"Treat\"  \"Prewt\"  \"Postwt\"\n\n\n\n\nUse pivot_longer function from dplyr\n\n\ndf_anorexia <- df_anorexia |> \n  pivot_longer(cols = c(Prewt, Postwt),\n               names_to = \"Time\",\n               values_to = \"Weight\")\nhead(df_anorexia, n=3)\n\n# A tibble: 3 × 4\n  id    Treat Time   Weight\n  <chr> <fct> <chr>   <dbl>\n1 1     Cont  Prewt    80.7\n2 1     Cont  Postwt   80.2\n3 2     Cont  Prewt    89.4"
+  },
+  {
+    "objectID": "presentations/day_3/d3.html#paired-test-using-gtsummary-1",
+    "href": "presentations/day_3/d3.html#paired-test-using-gtsummary-1",
+    "title": "Applying Tests of Significance",
+    "section": "Paired test using gtsummary",
+    "text": "Paired test using gtsummary\n\n\nT_Paired <- df_anorexia |> \n  tbl_summary(by=Time,\n              include = c(Weight))\nT_Paired\n\n\n\n\n\n\n  \n  \n    \n      Characteristic\n      Postwt, N = 721\n      Prewt, N = 721\n    \n  \n  \n    Weight\n84 (79, 92)\n82 (80, 86)\n  \n  \n  \n    \n      1 Median (IQR)"
+  },
+  {
+    "objectID": "presentations/day_3/d3.html#paired-test-using-gtsummary-2",
+    "href": "presentations/day_3/d3.html#paired-test-using-gtsummary-2",
+    "title": "Applying Tests of Significance",
+    "section": "Paired test using gtsummary",
+    "text": "Paired test using gtsummary\n\n\nT_Paired <- df_anorexia |> \n  tbl_summary(by=Time,\n              include = c(Weight)) |> \n  add_p()\nT_Paired\n\n\n\n\n\n\n  \n  \n    \n      Characteristic\n      Postwt, N = 721\n      Prewt, N = 721\n      p-value2\n    \n  \n  \n    Weight\n84 (79, 92)\n82 (80, 86)\n0.076\n  \n  \n  \n    \n      1 Median (IQR)\n    \n    \n      2 Wilcoxon rank sum test"
+  },
+  {
+    "objectID": "presentations/day_3/d3.html#paired-test-using-gtsummary-3",
+    "href": "presentations/day_3/d3.html#paired-test-using-gtsummary-3",
+    "title": "Applying Tests of Significance",
+    "section": "Paired test using gtsummary",
+    "text": "Paired test using gtsummary\n\n\nT_Paired <- df_anorexia |> \n  tbl_summary(by=Time,\n              include = c(Weight)) |> \n  add_p(test=all_continuous() ~ \"paired.wilcox.test\")\n\n\nThere was an error in 'add_p()/add_difference()' for variable 'Weight', p-value omitted:\nError: Paired tests require the `group=` argument.\n\nT_Paired\n\n\n\n\n\n  \n  \n    \n      Characteristic\n      Postwt, N = 721\n      Prewt, N = 721\n      p-value\n    \n  \n  \n    Weight\n84 (79, 92)\n82 (80, 86)\n\n  \n  \n  \n    \n      1 Median (IQR)\n    \n  \n\n\n\n\n\n. . . - map “group” to “id” variable\n\n\nT_Paired <- df_anorexia |> \n  tbl_summary(by=Time,\n              include = c(Weight)) |> \n  add_p(test=all_continuous() ~ \"paired.wilcox.test\", \n        group=\"id\")\nT_Paired\n\n\n\n\n\n\n  \n  \n    \n      Characteristic\n      Postwt, N = 721\n      Prewt, N = 721\n      p-value2\n    \n  \n  \n    Weight\n84 (79, 92)\n82 (80, 86)\n0.011\n  \n  \n  \n    \n      1 Median (IQR)\n    \n    \n      2 Wilcoxon signed rank test with continuity correction"
+  },
+  {
+    "objectID": "presentations/day_3/d3.html#paired-test-using-gtsummary-4",
+    "href": "presentations/day_3/d3.html#paired-test-using-gtsummary-4",
+    "title": "Applying Tests of Significance",
+    "section": "Paired test using gtsummary",
+    "text": "Paired test using gtsummary\n\nChange to paired.t.test\n\n\n\nT_Paired <- df_anorexia |> \n  tbl_summary(by=Time,\n              include = c(Weight),\n              statistic = list(all_continuous()~ \"{mean} ({sd})\")) |> \n  add_p(test=all_continuous() ~ \"paired.t.test\", \n        group=\"id\")\nT_Paired\n\n\n\n\n\n\n  \n  \n    \n      Characteristic\n      Postwt, N = 721\n      Prewt, N = 721\n      p-value2\n    \n  \n  \n    Weight\n85 (8)\n82 (5)\n0.004\n  \n  \n  \n    \n      1 Mean (SD)\n    \n    \n      2 Paired t-test\n    \n  \n\n\n\n\n\n. . . - use add_difference to have difference and p-value\n\n\nT_Paired <- df_anorexia |> \n  tbl_summary(by=Time,\n              include = c(Weight),\n              statistic = list(all_continuous()~ \"{mean} ({sd})\")) |> \n  add_difference(test=all_continuous() ~ \"paired.t.test\",\n                 group=\"id\")\nT_Paired\n\n\n\n\n\n\n  \n  \n    \n      Characteristic\n      Postwt, N = 721\n      Prewt, N = 721\n      Difference2\n      95% CI2,3\n      p-value2\n    \n  \n  \n    Weight\n85 (8)\n82 (5)\n-2.8\n-4.6, -0.89\n0.004\n  \n  \n  \n    \n      1 Mean (SD)\n    \n    \n      2 Paired t-test\n    \n    \n      3 CI = Confidence Interval"
+  },
+  {
+    "objectID": "presentations/day_3/d3.html#three-or-more-observations",
+    "href": "presentations/day_3/d3.html#three-or-more-observations",
+    "title": "Applying Tests of Significance",
+    "section": "Three or more observations",
+    "text": "Three or more observations\n\nWhen observations are repeated over time\nRepeated readings on same persons at different times\nDistribution of data\nRepeated Measures ANOVA\nFriednman’s test (Skewed data)"
+  },
+  {
+    "objectID": "presentations/day_3/d3.html#assumptions--repeated-measures",
+    "href": "presentations/day_3/d3.html#assumptions--repeated-measures",
+    "title": "Applying Tests of Significance",
+    "section": "Assumptions- Repeated measures",
+    "text": "Assumptions- Repeated measures\n\nNo significant outliers -box plot\nNormality: the outcome (or dependent) variable should be approximately normally distributed -Shapiro-Wilk normality test\nAssumption of sphericity: the variance of the differences between groups should be equal- Mauchly’s test of sphericity"
+  },
+  {
+    "objectID": "presentations/day_3/d3.html#example--repeated-measures",
+    "href": "presentations/day_3/d3.html#example--repeated-measures",
+    "title": "Applying Tests of Significance",
+    "section": "Example- Repeated measures",
+    "text": "Example- Repeated measures\n\nWe will use dataset from datarium package\nanxiety dataset will be used\nThe data provide the anxiety score, measured at three time points, of three groups of individuals practicing physical exercises at different levels (grp1: basal, grp2: moderate and grp3: high)\n\n\ndf_anxiety <- import(here(\"datasets\", \"anxiety\", \"df_anxiety.rds\"))\nhead(df_anxiety)\n\n# A tibble: 6 × 5\n  id    group    t1    t2    t3\n  <fct> <fct> <dbl> <dbl> <dbl>\n1 1     grp1   14.1  14.4  14.1\n2 2     grp1   14.5  14.6  14.3\n3 3     grp1   15.7  15.2  14.9\n4 4     grp1   16    15.5  15.3\n5 5     grp1   16.5  15.8  15.7\n6 6     grp1   16.9  16.5  16.2"
+  },
+  {
+    "objectID": "presentations/day_3/d3.html#example--repeated-measures-1",
+    "href": "presentations/day_3/d3.html#example--repeated-measures-1",
+    "title": "Applying Tests of Significance",
+    "section": "Example- Repeated measures",
+    "text": "Example- Repeated measures\n\nWe will use rstatix package which provides easy workflow\nWe have to convert data in long format\n\n\ndf_anxiety <- df_anxiety |> \n  pivot_longer(\n    cols = 3:5,\n    names_to = \"time\",\n    values_to = \"score\")\nhead(df_anxiety)\n\n# A tibble: 6 × 4\n  id    group time  score\n  <fct> <fct> <chr> <dbl>\n1 1     grp1  t1     14.1\n2 1     grp1  t2     14.4\n3 1     grp1  t3     14.1\n4 2     grp1  t1     14.5\n5 2     grp1  t2     14.6\n6 2     grp1  t3     14.3"
+  },
+  {
+    "objectID": "presentations/day_3/d3.html#check-distribution-and-outliers",
+    "href": "presentations/day_3/d3.html#check-distribution-and-outliers",
+    "title": "Applying Tests of Significance",
+    "section": "Check distribution and outliers",
+    "text": "Check distribution and outliers\n\ndf_anxiety |> ggplot(aes(y=score, x=time))+\n  geom_boxplot()\n\n\n\noutliers when present are indicated by points\nwe don’t see any outliers here"
+  },
+  {
+    "objectID": "presentations/day_3/d3.html#check-normality",
+    "href": "presentations/day_3/d3.html#check-normality",
+    "title": "Applying Tests of Significance",
+    "section": "Check normality",
+    "text": "Check normality\n\nlibrary(rstatix)\ndf_anxiety |> \n  group_by(time) |> \n  shapiro_test(score)\n\n# A tibble: 3 × 4\n  time  variable statistic     p\n  <chr> <chr>        <dbl> <dbl>\n1 t1    score        0.979 0.565\n2 t2    score        0.983 0.747\n3 t3    score        0.982 0.719\n\n\n\np-value non-significant, indicates approximate normal distribution"
+  },
+  {
+    "objectID": "presentations/day_3/d3.html#perform-repeated-measures-anova",
+    "href": "presentations/day_3/d3.html#perform-repeated-measures-anova",
+    "title": "Applying Tests of Significance",
+    "section": "Perform repeated measures ANOVA",
+    "text": "Perform repeated measures ANOVA\n\nanova_test() from rstatix package,\n  a wrapper around car::Anova() for making easy the computation of repeated measures ANOVA. \ndata: data frame\ndv: (numeric) the dependent (or outcome) variable name.\nwid: variable name specifying the case/sample identifier.\nwithin: within-subjects factor or grouping variable\nget_anova_table() [rstatix package]. Extracts the ANOVA table from the output of anova_test()"
+  },
+  {
+    "objectID": "presentations/day_3/d3.html#perform-repeated-measures-anova-1",
+    "href": "presentations/day_3/d3.html#perform-repeated-measures-anova-1",
+    "title": "Applying Tests of Significance",
+    "section": "Perform repeated measures ANOVA",
+    "text": "Perform repeated measures ANOVA\n\nlibrary(rstatix)\nresult <- anova_test(data = df_anxiety, dv = score, wid = id, within = time)\nget_anova_table(result)\n\nANOVA Table (type III tests)\n\n  Effect  DFn   DFd      F        p p<.05   ges\n1   time 1.15 50.55 66.226 1.66e-11     * 0.141\n\n\n\n\nusing base R\n\n\nresult <- aov(score~ time + Error(id/time), data = df_anxiety)\nsummary(result)\n\n\nError: id\n          Df Sum Sq Mean Sq F value Pr(>F)\nResiduals 44  361.1   8.208               \n\nError: id:time\n          Df Sum Sq Mean Sq F value Pr(>F)    \ntime       2  66.58   33.29   66.23 <2e-16 ***\nResiduals 88  44.23    0.50                   \n---\nSignif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1"
+  },
+  {
+    "objectID": "presentations/day_3/d3.html#graphs-and-stats-together-3",
+    "href": "presentations/day_3/d3.html#graphs-and-stats-together-3",
+    "title": "Applying Tests of Significance",
+    "section": "Graphs and stats together",
+    "text": "Graphs and stats together\n\nggstatsplot::ggwithinstats(data = df_anxiety, x= time, y= score)"
+  },
+  {
+    "objectID": "presentations/day_3/d3.html#compare-mean-with-some-reference",
+    "href": "presentations/day_3/d3.html#compare-mean-with-some-reference",
+    "title": "Applying Tests of Significance",
+    "section": "Compare mean with some reference",
+    "text": "Compare mean with some reference\n\nwe have estimated mean for one group, want to compare with that reported in literature\nOne-sample t-test can be used\nRecall Framingham dataset, mean SBP was 132.7737226\nWe would like to test if it is different from population mean of 125\n\n\nresult <- t.test(df_framingham$sbp, mu=125)\nresult\n\n\n    One Sample t-test\n\ndata:  df_framingham$sbp\nt = 23.274, df = 4657, p-value < 2.2e-16\nalternative hypothesis: true mean is not equal to 125\n95 percent confidence interval:\n 132.1189 133.4285\nsample estimates:\nmean of x \n 132.7737 \n\n\n\n\ninterpretation\n\n\nreport::report(result)\n\nEffect sizes were labelled following Cohen's (1988) recommendations.\n\nThe One Sample t-test testing the difference between df_framingham$sbp (mean =\n132.77) and mu = 125 suggests that the effect is positive, statistically\nsignificant, and small (difference = 7.77, 95% CI [132.12, 133.43], t(4657) =\n23.27, p < .001; Cohen's d = 0.34, 95% CI [0.31, 0.37])"
+  },
+  {
+    "objectID": "presentations/day_3/d3.html#compare-proportion-with-some-reference",
+    "href": "presentations/day_3/d3.html#compare-proportion-with-some-reference",
+    "title": "Applying Tests of Significance",
+    "section": "Compare proportion with some reference",
+    "text": "Compare proportion with some reference\n\nwe have estimated proportion for one group, want to compare with that reported in literature\nOne-proportion test can be used\nRecall Framingham dataset, out of 4658 observations with avaialble blood pressure 1760 (37.8%) had hypertension\nWe want to test if it is different from true population proportion of 25%\n\n\nresult <- prop.test(x=1760, n=4658, p=0.25)\nresult\n\n\n    1-sample proportions test with continuity correction\n\ndata:  1760 out of 4658, null probability 0.25\nX-squared = 405.35, df = 1, p-value < 2.2e-16\nalternative hypothesis: true p is not equal to 0.25\n95 percent confidence interval:\n 0.3639204 0.3919716\nsample estimates:\n        p \n0.3778446"
+  },
+  {
+    "objectID": "presentations/day_3/d3.html#compare-proportion-with-some-reference-1",
+    "href": "presentations/day_3/d3.html#compare-proportion-with-some-reference-1",
+    "title": "Applying Tests of Significance",
+    "section": "Compare proportion with some reference",
+    "text": "Compare proportion with some reference\n\nsometimes our sample size is small and we can’t use prop.test owing to assumptions\nsuch data often follow binomial distribution and we have to use binom.test\nsuppose 13 out of 24 patients had responded to a novel therapy, are the results different from 30% cure rate reported with standard therapy\n\n\n# exact binomial test\nresult <- binom.test(\n  x = 13, # counts of successes\n  n = 24, # total sample size \n  p = 0.3 # expected proportion\n)\n\nresult\n\n\n    Exact binomial test\n\ndata:  13 and 24\nnumber of successes = 13, number of trials = 24, p-value = 0.01366\nalternative hypothesis: true probability of success is not equal to 0.3\n95 percent confidence interval:\n 0.3282081 0.7444698\nsample estimates:\nprobability of success \n             0.5416667"
+  },
+  {
+    "objectID": "registration.html",
+    "href": "registration.html",
+    "title": "Regsitration",
+    "section": "",
+    "text": "Registration fees- Rs 2950 (Rs 2500 + GST Rs 450)\nRegistration form- Click here or scan"
+  },
+  {
+    "objectID": "resources.html",
+    "href": "resources.html",
+    "title": "Additional Resources",
+    "section": "",
+    "text": "Under construction"
+  }
+]

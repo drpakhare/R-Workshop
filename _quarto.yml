@@ -1,0 +1,37 @@
+project:
+  type: website
+  render:
+    - "*.qmd"
+    - "!exercises/Day_3_Ex_Stats_Tests.Rmd"
+
+website:
+  title: "Home"
+  twitter-card: true
+  google-analytics: "G-7184YH3PG6"
+  cookie-consent: true
+  sidebar:
+    style: "docked"
+    search: true
+    contents:
+      - section: "About"
+        contents:
+          - about.qmd
+          - registration.qmd
+      - section: "Presentations"
+        contents:
+          - presentations.qmd
+      - section: "Workshop Kit"
+        contents:
+          - datasets.qmd
+          - exercises.qmd
+      - section: "Resources"
+        contents:
+          - resources.qmd
+format:
+  html:
+    theme: cosmo
+    css: styles.css
+    toc: true
+
+editor: visual
+

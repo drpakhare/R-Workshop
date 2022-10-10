@@ -1,0 +1,12 @@
+---
+title: "Datasets for practice"
+editor: visual
+---
+
+| Dataset Name | Brief                                                                         | Download Link                                       | Source Link                                                             |
+|----------------|-------------------|-------------------|-------------------|
+| abm          | Acute Bacterial Mengitis                                                      | [Download](datasets/abm/abm.xlsx)                   | [Source](https://hbiostat.org/data/)                                    |
+| anorexia     | Weight measurement before and after treatment of anorexia                     | [Download](datasets/anorexia/df_anorexia.rds)       | [Source](https://cran.r-project.org/web/packages/PairedData/index.html) |
+| anxiety      | Anxiety score measured at three time points                                   | [Download](datasets/anxiety/df_anxiety.rds)         | [Source](https://cran.r-project.org/web/packages/datarium/index.html)   |
+| framingham   |                                                                               | [Download](datasets/framingham/df_framingham.Rdata) | [Source](https://github.com/higgi13425/medicaldata)                     |
+| lead         | Blood lead levels in children of industrial worker and their matched control  | [Download](datasets/lead/lead.rds)                  | [Source](https://cran.r-project.org/web/packages/PairedData/index.html) |

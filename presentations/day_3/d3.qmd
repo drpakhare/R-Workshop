@@ -1,0 +1,988 @@
+---
+title: "Applying Tests of Significance"
+format: 
+  revealjs: 
+    theme: slides.scss
+    transition: fade
+    slide-number: true
+    chalkboard: 
+      buttons: true
+execute:
+  echo: true
+  freeze: auto
+cache: true
+logo: "../../images/Data Analysis with R.png"
+editor: visual
+---
+
+# Comparing numerical variables across two groups
+
+## Selection of test
+
+```{r}
+#| echo: false
+library(DiagrammeR)
+grViz("
+digraph two_numerical {
+graph[rankdir = TD]
+
+node [fontname = Helvetica, shape=box,  style=filled]
+
+A [label = '@@1', fillcolor= LightBlue]
+B [label = '@@2', fillcolor= LightBlue]
+C [label = '@@3', fillcolor= Salmon]
+D [label = '@@4', fillcolor= Salmon]
+E [label = '@@5', fillcolor= LightCyan]
+F [label = '@@6', fillcolor= LightCyan]
+G [label = '@@7', fillcolor= LightCyan]
+H [label = '@@8', fillcolor= LightPink]
+I [label = '@@9', fillcolor= LightBlue]
+# several 'edge' statements
+A->B B->C A->I I->D 
+edge [label= 'not skewed', fontsize=7]
+C->E 
+
+edge [label= 'skewed', fontsize=7]
+C->H
+
+edge [label= 'p>0.05', fontsize=7]
+D->E 
+
+edge [label= 'p < 0.05', fontsize=7]
+D->H
+
+edge [label= 'equal variances', fontsize=7]
+E->F 
+
+edge [label= 'unequal variances', fontsize=7]
+E->G
+
+}
+  [1]: 'Check distribution of \\nnumerical variable'
+  [2]: 'Plot histogram or \\ndensity curve or \\nQ-Q plot'
+  [3]: 'Look for shape \\nis it skewed?'
+  [4]: 'Check p-value'
+  [5]: 't-test'
+  [6]: 'Student t-test'
+  [7]: 'Welch t-test'
+  [8]: 'Wilcoxan rank-sum test\\n a.k.a. Mann-Whitney Test'
+  [9]: 'Use Shapiro-Wilk Test'
+  ")
+```
+
+## Example-1
+
+-   Let us explore dataset from Framingham study
+-   Is there a difference in SBP among men and women?
+
+```{r}
+#| echo: true 
+#| output-location: column
+library(here)
+library(rio)
+library(tidyverse)
+df_framingham <- import(here("datasets", "framingham", "Framingham.Rdata"))
+names(df_framingham)
+```
+
+## Check distributions (histogram)
+
+```{r}
+#| echo: true 
+#| output-location: column
+sbp_distribution <- ggplot(df_framingham, aes(x=sbp))+
+  geom_histogram(aes(y = ..density..))+
+  geom_density(colour="red")
+sbp_distribution
+```
+
+## Check distributions (Q-Q plot)
+
+-   Q-Q plot by using `qqnorm` function
+
+```{r}
+#| output-location: column
+
+qqnorm(df_framingham$sbp)
+```
+
+## Check distributions
+
+-   Let us check distribution across gender
+
+```{r}
+#| echo: true 
+#| output-location: column
+
+sbp_distribution <- ggplot(df_framingham, aes(x=sbp))+
+  geom_histogram(aes(fill=factor(sex)), alpha=0.3) 
+sbp_distribution
+```
+
+## Test for normality
+
+-   this is done by using Shapiro-Wilk Normality Test available through `shapiro.test` function of base R
+
+```{r}
+#| output-location: column
+
+shapiro.test(df_framingham$sbp)
+```
+
+## Wilcoxan rank-sum test
+
+-   `base` R provides functions for many statistical tests
+-   we will compute Wilcoxan rank-sum test by using `wilcox.test` function of base R
+
+```{r}
+wilcox.test(sbp ~ sex, data = df_framingham)
+```
+
+## t-test
+
+-   for comparing two means we can use `t.test` function
+
+```{r}
+t.test(sbp ~ sex, data = df_framingham)
+```
+
+## Compare two groups- using `gtsummary`
+
+-   we need to compare many numerical variables
+-   e.g. dbp, cholesterol in this case
+-   and present it in tidy format
+-   `gtsummary` package
+-   `add_p()` function
+
+## Compare two groups- using `gtsummary` {.smaller auto-animate="true"}
+
+```{r}
+#| output-location: column
+library(gtsummary)
+df_framingham |> 
+  select(-id,
+         -followup) |> 
+  tbl_summary(by=sex) 
+
+```
+
+## Compare two groups- using `gtsummary` {.smaller auto-animate="true"}
+
+```{r}
+#| output-location: column
+#| code-line-numbers: "6"
+library(gtsummary)
+df_framingham |> 
+  select(-id,
+         -followup) |> 
+  tbl_summary(by=sex) |> 
+  add_p()
+
+```
+
+## Compare two groups- change test {.smaller auto-animate="true"}
+
+```{r}
+#| output-location: column
+#| code-line-numbers: "7"
+library(gtsummary)
+df_framingham |> 
+  select(-id,
+         -followup) |> 
+  tbl_summary(by=sex,
+              statistic = list(all_continuous()~ "{mean} ({sd})")) |> 
+  add_p(list(all_continuous() ~ "t.test")) 
+```
+
+-   let us change type of statistical test
+-   it is done by assigning tests in `add_p` function
+
+## Difference in two types of tests
+
+```{r}
+#| echo: false
+T1 <- df_framingham |> 
+  select(-id,
+         -followup) |> 
+  tbl_summary(by=sex,
+              statistic = list(all_continuous()~ "{mean} ({sd})")) |> 
+  add_p(list(all_continuous() ~ "t.test"),
+        pvalue_fun= function(x) style_pvalue(x, digits = 3))
+T2 <- df_framingham |> 
+  select(-id,
+         -followup) |> 
+  tbl_summary(by=sex) |> 
+  add_p(pvalue_fun= function(x) style_pvalue(x, digits = 3))
+T_Merged <- tbl_merge(tbls = list(T1,T2),
+                      tab_spanner = c("**t-test**", "**Wilcoxan rank-sum test**"))
+T_Merged
+```
+
+## Compare groups- graphs & tests together `ggstatplot`
+
+```{r}
+#| code-line-numbers: "1|3|4"
+library(ggstatsplot)
+df_framingham |> 
+  ggbetweenstats(x=sex,
+                 y=sbp)
+```
+
+## Graphs & tests together `ggstatplot`
+
+```{r}
+#| code-fold: true
+library(ggstatsplot)
+df_framingham |> 
+  ggbetweenstats(x=sex,
+                 y=sbp,
+                 plot.type = "box",
+                 type = "nonparametric",
+                 point.args = list(position = ggplot2::position_jitterdodge(dodge.width = 0.6), alpha =
+    0.1, size = 0.5, stroke = 0))
+```
+
+# Comparing numerical variables across three or more groups
+
+## Selection of test
+
+-   distribution of data
+
+-   equality of variances
+
+-   Parametric or non-skewed
+
+-   
+
+          One-Way Analysis of Variance (ANOVA)
+
+-   
+
+          Felch-ANOVA (Unequal variances)
+
+-   Kruskal-Wallis Test
+
+## Example-2
+
+Let us create varaible with 3 categories from variable bmi
+
+```{r}
+df_framingham <- df_framingham |> 
+  mutate(bmi_cat = case_when(
+    bmi <= 25 ~ "<=25",
+    (bmi>25 & bmi<=30) ~ "Overweight",
+    bmi >30 ~ "Obese"
+  )) |> 
+  mutate(bmi_cat = factor(bmi_cat,
+                          levels = c("<=25",
+                                     "Overweight",
+                                     "Obese"))) |> 
+  drop_na()
+```
+
+## Check distributions (Density curves)
+
+```{r}
+ggplot(data = df_framingham, aes(x=sbp))+
+  geom_density(aes(fill=bmi_cat), alpha=0.3)
+```
+
+## Check distributions (Box-plots)
+
+```{r}
+ggplot(data = df_framingham, aes(y=sbp, x=bmi_cat))+
+  geom_boxplot(aes(fill=bmi_cat), alpha=0.3)+
+  theme_ggstatsplot()
+```
+
+## Check distributions (Shapiro-Wilk Test) {.smaller}
+
+```{r}
+normality_test <- df_framingham |> split(~bmi_cat) %>%
+  map(~ shapiro.test(.x$sbp))
+normality_test
+```
+
+## Kruskal-Wallis test
+
+```{r}
+kruskal.test(sbp ~ bmi_cat, data = df_framingham)
+```
+
+## Pair-wise comparisons
+
+-   post-hoc tests
+-   when initial test indicates difference in distribution
+-   many tests
+-   Dunn's test for non-parametric
+
+## Pair-wise comparisons
+
+```{r}
+library(PMCMRplus)
+kwAllPairsDunnTest(sbp ~ bmi_cat, data = df_framingham)
+```
+
+. . .
+
+```{r}
+summary(kwAllPairsDunnTest(sbp ~ bmi_cat, data = df_framingham))
+
+```
+
+## One way ANOVA
+
+```{r}
+aov(sbp ~ bmi_cat, data = df_framingham)
+```
+
+. . .
+
+```{r}
+summary.aov(aov(sbp ~ bmi_cat, data = df_framingham))
+```
+
+## Pair-wise comparison after ANOVA
+
+-   pair wise t tests with Bonferroni correction
+
+```{r}
+with (df_framingham, pairwise.t.test(sbp, bmi_cat,  p.adjust.method = "bonf"))
+```
+
+## Graphs and stats together
+
+```{r}
+#| code-fold: true
+ggstatsplot::ggbetweenstats(data = df_framingham,
+                        x=bmi_cat,
+                        y=sbp,
+                        plot.type = "box",
+                 type = "nonparametric",
+                 point.args = list(position = ggplot2::position_jitterdodge(dodge.width = 0.6), alpha =
+    0.1, size = 0.5, stroke = 0))
+```
+
+## Graphs and stats together (Parametric)
+
+```{r}
+#| code-fold: true
+ggstatsplot::ggbetweenstats(data = df_framingham,
+                        x=bmi_cat,
+                        y=sbp,
+                        plot.type = "box",
+                 type = "parametric",
+                 point.args = list(position = ggplot2::position_jitterdodge(dodge.width = 0.6), alpha =
+    0.1, size = 0.5, stroke = 0))
+```
+
+## Using `gtsummary`
+
+```{r}
+#| code-fold: true
+df_framingham |> gtsummary::tbl_summary(
+  by = bmi_cat,
+  include = (c( sbp, dbp, scl)),
+  digits = list(all_continuous()~c(1,1))
+) |> 
+  add_p()
+```
+
+## Using `gtsummary` (Compare against reference)
+
+```{r}
+#| code-fold: true
+# table summarizing data
+t0 <- df_framingham |> gtsummary::tbl_summary(
+  by = bmi_cat,
+  include = (c( sbp, dbp, scl)),
+  digits = list(all_continuous()~c(1,1))) 
+
+# table comparing <=25 with Overweight
+t1 <- df_framingham |> 
+  filter(bmi_cat %in% c("<=25", "Overweight")) |> 
+  tbl_summary(by = bmi_cat, missing = "no",
+              include = (c( sbp, dbp, scl))) |> 
+  add_p() |> 
+  modify_header(p.value ~ ("**<=25 vs. Overweight**")) |> 
+  # hide summary stat columns
+  modify_column_hide(all_stat_cols())
+
+# table comparing <=25 with Obese
+t2 <- df_framingham |> 
+  filter(bmi_cat %in% c("<=25", "Obese")) |> 
+  tbl_summary(by = bmi_cat, missing = "no",
+              include = (c( sbp, dbp, scl))) |> 
+  add_p() |> 
+  modify_header(p.value ~ ("**<=25 vs. Obese**")) |> 
+  # hide summary stat columns
+  modify_column_hide(all_stat_cols())
+
+# merging the 3 tables together, and adding additional gt formatting
+tbl_merge(list(t0, t1, t2)) %>%
+  modify_spanning_header(
+    list(
+      all_stat_cols() ~ "**BMI Groups**",
+      starts_with("p.value") ~ "**p-values**"
+    )
+  )
+```
+
+# Comparing proportions
+
+## Categorical or nominal variables
+
+-   Nominal or categorical variables - summarized as proportion
+-   Many clinical outcomes are presented as binary or categorical variable for ease of interpretation
+-   Blood pressure readings are converted to categorical- Presence or absence of hypertension
+-   Our interest lies in knowing if one group has more proportion of an outcome than other group
+
+## Selection of test
+
+-   Two independent groups
+
+-   
+
+          Chi-square test
+
+-   
+
+          Difference in two proportions
+
+-   
+
+          Fisher's exact test (expected freq <5)
+
+-   Paired or non-independent observations
+
+-   
+
+          binary or two categories- McNemar test
+
+-   
+
+          >2 categories- Cochran's Q
+
+## Example- 3
+
+-   Let's create variable 'bp_categories' from sbp and dbp
+
+```{r}
+df_framingham <-  df_framingham |> 
+  mutate(bp_categories= case_when(
+    (sbp>=140 | dbp>=90) ~ "hypertension",
+    (sbp<140 & sbp>=120) |(dbp<90 & dbp>=80) ~ "elevated BP",
+    (sbp<120 & dbp<80) ~ "normotensive"
+  )) |> 
+  mutate(bp_categories=factor(bp_categories,
+                              levels = c("normotensive",
+                                         "elevated BP",
+                                         "hypertension"),
+                              labels = c("Normotensive",
+                                         "Elevated BP",
+                                         "Hypertension")))
+```
+
+## Apply Chi-square test
+
+```{r}
+table(df_framingham$bmi_cat, df_framingham$bp_categories)
+```
+
+. . .
+
+```{r}
+chisq.test(df_framingham$bmi_cat, df_framingham$bp_categories)
+```
+
+. . .
+
+```{r}
+with(df_framingham, chisq.test(bmi_cat, bp_categories))
+```
+
+## Apply Chi-square test {.smaller auto-animate="true"}
+
+```{r}
+#| output-location: column
+library(gtsummary)
+df_framingham |> 
+  tbl_summary(by=bp_categories,
+              include = c(sex, bmi_cat),
+              digits = list(all_categorical() ~ c(0,1)))
+```
+
+## Apply Chi-square test {.smaller auto-animate="true"}
+
+```{r}
+#| output-location: column
+#| code-line-numbers: "6"
+library(gtsummary)
+df_framingham |> 
+  tbl_summary(by=bp_categories,
+              include = c(sex, bmi_cat),
+              digits = list(all_categorical() ~ c(0,1))) |> 
+  add_p()
+```
+
+## Apply Chi-square test {.smaller auto-animate="true"}
+
+```{r}
+#| output-location: column
+#| code-line-numbers: "4"
+library(gtsummary)
+df_framingham |> 
+  tbl_summary(by=bp_categories,
+              percent = "row",
+              include = c(sex, bmi_cat),
+              digits = list(all_categorical() ~ c(0,1))) |> 
+  add_p() 
+```
+
+-   percentages changed to row percent
+
+## Apply Chi-square test {.smaller auto-animate="true"}
+
+```{r}
+#| output-location: column
+#| code-line-numbers: "5"
+library(gtsummary)
+df_framingham |> 
+  tbl_summary(by=bp_categories,
+              percent = "row",
+              statistic = list(all_categorical()~"{n} ({p})"),
+              include = c(sex, bmi_cat),
+              digits = list(all_categorical() ~ c(0,1))) |> 
+  add_p() 
+```
+
+-   percent sign removed
+
+## Graphs and stats together
+
+```{r}
+#| code-fold: true
+library(ggstatsplot)
+df_framingham |> 
+  ggbarstats(x = bp_categories,
+             y = bmi_cat,
+             proportion.test = FALSE,
+             xlab = "",
+             legend.title = "BP Categories",
+             title = "Association of BMI and BP Status",
+             bf.message = FALSE,
+             ggtheme = ggthemes::theme_fivethirtyeight())
+```
+
+## Graphs and stats together
+
+```{r}
+#| code-fold: true
+library(ggstatsplot)
+df_framingham |> 
+  mutate(sex = factor(sex, labels = c("Males", "Females"))) |> 
+  ggbarstats(x = bp_categories,
+             y = sex,
+             proportion.test = FALSE,
+             xlab = "",
+             legend.title = "BP Categories",
+             title = "Association of Sex and BP Status",
+             bf.message = FALSE,
+             ggtheme = ggthemes::theme_wsj())
+```
+
+## Comparing two related or paired nominal variables
+
+-   Categorical observation on same subject 2 or more times
+
+-   
+
+          Result of certain test as Pos/Neg at two different times
+
+-   
+
+          Result of two different tests on same subject at same time
+
+-   
+
+          Diagnostic research - new test vs reference
+
+-   Paired or matched observation
+
+-   
+
+          matched pair case-control studies
+
+-   Let's explore with example
+
+## Comparing two paired nominal observations {.smaller}
+
+-   Dataset contains Blood lead levels data from Pruzek & Helmreich
+
+(2009) 
+
+-   matched paired data corresponding to blood lead levels for 33 children of parents who had worked in a lead related factory and 33 control children from their neighborhood
+-   Blood lead levels more than 20 ug/dL are categorized as "High"
+-   Let's import dataset and view its `head`
+
+```{r}
+df_lead <- import(here("datasets", "lead", "df_lead.rds"))
+head(df_lead, n=4)
+```
+
+## McNemar Test
+
+```{r}
+table(df_lead$Exposed_Cat, df_lead$Control_Cat)
+```
+
+```{r}
+result <- mcnemar.test(df_lead$Exposed_Cat, df_lead$Control_Cat)
+result
+```
+
+## McNemar Test in `gtsummary`
+
+```{r}
+library(gtsummary)
+df_lead |> 
+  tbl_summary(by=Control_Cat,
+              include = c(Exposed_Cat)) |> 
+  add_p(test=all_categorical()~"mcnemar.test.wide") |> 
+  modify_spanning_header(all_stat_cols()~ "**Control_Cat**")
+```
+
+# Comparing repeated or related numerical observations
+
+## Two observations (before-after type)
+
+-   Normally distributed- paired t-test
+
+-   Skewed- Wilcoxan Signed Rank Test
+
+-   Example- Dataset contain weights before and after treatment of anorexia
+
+-   
+
+          Let's load the data and view structure
+
+```{r}
+df_anorexia <- import(here("datasets", "anorexia", "df_anorexia.rds"))
+str(df_anorexia)
+```
+
+## Check distributions
+
+-   Plot histograms (quickly)
+
+```{r}
+hist(df_anorexia$Prewt,  xlab = "Pre Weight")
+summary(df_anorexia$Prewt)
+
+```
+
+## Check distributions
+
+```{r}
+hist(df_anorexia$Postwt,  xlab = "Post Weight")
+summary(df_anorexia$Postwt)
+
+```
+
+## Check normality - Shapiro-Wilk Test
+
+```{r}
+shapiro.test(df_anorexia$Prewt)
+```
+
+. . .
+
+```{r}
+shapiro.test(df_anorexia$Postwt)
+```
+
+## Wilcoxan signed-rank test
+
+```{r}
+with(df_anorexia, wilcox.test(Postwt, Prewt, 
+                              paired=TRUE))
+# save it as result
+result <- wilcox.test(df_anorexia$Postwt, df_anorexia$Prewt,
+                              paired=TRUE)
+```
+
+. . . - Let's use `report` package to understand results
+
+```{r}
+library(report)
+report(result)
+```
+
+## Paired t-test {.smaller}
+
+```{r}
+result <- with(df_anorexia, t.test(Prewt, Postwt, paired=TRUE))
+result
+```
+
+. . . - Let's use `report` package to understand results
+
+```{r}
+library(report)
+report(result)
+```
+
+## Paired test using `gtsummary` {.smaller}
+
+-   needs data in long format
+-   each individual will have two readings . . .
+
+```{r}
+library(tidyverse)
+# Convert row number to id
+df_anorexia <- df_anorexia |> 
+  rownames_to_column(var = "id") 
+names(df_anorexia)  
+```
+
+. . .
+
+-   Use `pivot_longer` function from dplyr
+
+```{r}
+df_anorexia <- df_anorexia |> 
+  pivot_longer(cols = c(Prewt, Postwt),
+               names_to = "Time",
+               values_to = "Weight")
+head(df_anorexia, n=3)
+```
+
+## Paired test using `gtsummary` {.smaller auto-animate="true"}
+
+```{r}
+#| output-location: column
+T_Paired <- df_anorexia |> 
+  tbl_summary(by=Time,
+              include = c(Weight))
+T_Paired
+```
+
+## Paired test using `gtsummary` {.smaller auto-animate="true"}
+
+```{r}
+#| output-location: column
+#| code-line-numbers: "4"
+T_Paired <- df_anorexia |> 
+  tbl_summary(by=Time,
+              include = c(Weight)) |> 
+  add_p()
+T_Paired
+```
+
+## Paired test using `gtsummary` {.smaller auto-animate="true"}
+
+```{r}
+#| output-location: column
+#| code-line-numbers: "4"
+#| warning: true
+T_Paired <- df_anorexia |> 
+  tbl_summary(by=Time,
+              include = c(Weight)) |> 
+  add_p(test=all_continuous() ~ "paired.wilcox.test")
+T_Paired
+```
+
+. . . - map "group" to "id" variable
+
+```{r}
+#| output-location: column
+#| code-line-numbers: "4"
+T_Paired <- df_anorexia |> 
+  tbl_summary(by=Time,
+              include = c(Weight)) |> 
+  add_p(test=all_continuous() ~ "paired.wilcox.test", 
+        group="id")
+T_Paired
+```
+
+## Paired test using `gtsummary` {.smaller auto-animate="true"}
+
+-   Change to paired.t.test
+
+```{r}
+#| output-location: column
+#| code-line-numbers: "4|5|6"
+T_Paired <- df_anorexia |> 
+  tbl_summary(by=Time,
+              include = c(Weight),
+              statistic = list(all_continuous()~ "{mean} ({sd})")) |> 
+  add_p(test=all_continuous() ~ "paired.t.test", 
+        group="id")
+T_Paired
+```
+
+. . . - use `add_difference` to have difference and p-value
+
+```{r}
+#| output-location: column
+#| code-line-numbers: "4|5"
+T_Paired <- df_anorexia |> 
+  tbl_summary(by=Time,
+              include = c(Weight),
+              statistic = list(all_continuous()~ "{mean} ({sd})")) |> 
+  add_difference(test=all_continuous() ~ "paired.t.test",
+                 group="id")
+T_Paired
+```
+
+## Three or more observations
+
+-   When observations are repeated over time
+-   Repeated readings on same persons at different times
+-   Distribution of data
+-   Repeated Measures ANOVA
+-   Friednman's test (Skewed data)
+
+## Assumptions- Repeated measures
+
+-   No significant outliers -box plot
+-   Normality: the outcome (or dependent) variable should be approximately normally distributed -Shapiro-Wilk normality test
+-   Assumption of sphericity: the variance of the differences between groups should be equal- Mauchly's test of sphericity
+
+## Example- Repeated measures
+
+-   We will use dataset from `datarium` package
+-   anxiety dataset will be used
+-   The data provide the anxiety score, measured at three time points, of three groups of individuals practicing physical exercises at different levels (grp1: basal, grp2: moderate and grp3: high)
+
+```{r}
+df_anxiety <- import(here("datasets", "anxiety", "df_anxiety.rds"))
+head(df_anxiety)
+```
+
+## Example- Repeated measures
+
+-   We will use `rstatix` package which provides easy workflow
+-   We have to convert data in long format
+
+```{r}
+df_anxiety <- df_anxiety |> 
+  pivot_longer(
+    cols = 3:5,
+    names_to = "time",
+    values_to = "score")
+head(df_anxiety)
+```
+
+## Check distribution and outliers
+
+```{r}
+df_anxiety |> ggplot(aes(y=score, x=time))+
+  geom_boxplot()
+```
+
+-   outliers when present are indicated by points
+-   we don't see any outliers here
+
+## Check normality
+
+```{r}
+library(rstatix)
+df_anxiety |> 
+  group_by(time) |> 
+  shapiro_test(score)
+```
+
+-   p-value non-significant, indicates approximate normal distribution
+
+## Perform repeated measures ANOVA
+
+-   `anova_test()` from `rstatix` package,
+
+-   
+
+          a wrapper around car::Anova() for making easy the computation of repeated measures ANOVA. 
+
+-   data: data frame
+
+-   dv: (numeric) the dependent (or outcome) variable name.
+
+-   wid: variable name specifying the case/sample identifier.
+
+-   within: within-subjects factor or grouping variable
+
+-   get_anova_table() \[rstatix package\]. Extracts the ANOVA table from the output of anova_test()
+
+## Perform repeated measures ANOVA
+
+```{r}
+library(rstatix)
+result <- anova_test(data = df_anxiety, dv = score, wid = id, within = time)
+get_anova_table(result)
+```
+
+. . .
+
+-   using base R
+
+```{r}
+result <- aov(score~ time + Error(id/time), data = df_anxiety)
+summary(result)
+```
+
+## Graphs and stats together
+
+```{r}
+ggstatsplot::ggwithinstats(data = df_anxiety, x= time, y= score)
+```
+
+# When you have only one group
+
+## Compare mean with some reference {.smaller}
+
+-   we have estimated mean for one group, want to compare with that reported in literature
+-   One-sample t-test can be used
+-   Recall Framingham dataset, mean SBP was `r mean(df_framingham$sbp)`
+-   We would like to test if it is different from population mean of 125
+
+```{r}
+result <- t.test(df_framingham$sbp, mu=125)
+result
+```
+
+. . .
+
+-   interpretation
+
+```{r}
+report::report(result)
+```
+
+## Compare proportion with some reference {.smaller}
+
+-   we have estimated proportion for one group, want to compare with that reported in literature
+-   One-proportion test can be used
+-   Recall Framingham dataset, out of 4658 observations with avaialble blood pressure 1760 (37.8%) had hypertension
+-   We want to test if it is different from true population proportion of 25%
+
+```{r}
+result <- prop.test(x=1760, n=4658, p=0.25)
+result
+```
+
+## Compare proportion with some reference {.smaller}
+
+-   sometimes our sample size is small and we can't use `prop.test` owing to assumptions
+-   such data often follow binomial distribution and we have to use `binom.test`
+-   suppose 13 out of 24 patients had responded to a novel therapy, are the results different from 30% cure rate reported with standard therapy
+
+```{r}
+# exact binomial test
+result <- binom.test(
+  x = 13, # counts of successes
+  n = 24, # total sample size 
+  p = 0.3 # expected proportion
+)
+
+result
+```

@@ -1,0 +1,4 @@
+- source: project
+  quarto-pub:
+    - id: 96b83bbf-bc17-4d9a-bdd6-1d7f98ef8af8
+      url: 'https://quartopub.com/sites/cfm-workshops/r-workshop'

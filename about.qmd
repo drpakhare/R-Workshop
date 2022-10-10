@@ -1,0 +1,31 @@
+---
+title: "About Us"
+---
+
+### [**AIIMS Bhopal**](https://www.aiimsbhopal.edu.in)
+
+![](images/logo_112.jpeg){fig-align="center"}
+
+AIIMS Bhopal is one of the apex healthcare institutes established by the Ministry of Health & Family Welfare, Government of India under the Pradhan Mantri Swasthya Suraksha Yojana (PMSSY). AIIMS, Bhopal has the vision to make it as one of the excellent Health Care Centers to serve the people of Central India as envisaged under the PMSSY.
+
+![](images/banner9_1.jpeg){fig-align="center"}
+
+### [**Department of Community & Family Medicine**](https://aiimsbhopal.edu.in/index_controller/Details?did=11&id=57#SHTM)					
+
+Department has been pivotal in
+imparting research methodology,
+epidemiology and biostatistics trainings.
+It has a set up a computer laboratory
+and conducted workshops for faculty
+and SRs of the institute. Departmental
+faculty have expertise in advanced data
+analysis and open source softwares like
+Epi-Infor, Jamovi, Jasp, OpenEpi etc as
+well as R programming.
+
+					
+				
+			
+		
+
+	
